@@ -1,0 +1,31 @@
+version: '3.3'
+volumes:
+  mongodbdata:
+secrets:
+  conf:
+    file: ./conf.json
+services:
+  mongo:
+    image: "mongo:3.0"
+    ports: 
+      - "27017:27017"  # For debugging purposes
+    command: --smallfiles
+    volumes:
+      - mongodbdata:/data/db
+  rabbit:
+    image: "rabbitmq:3-management"
+    ports: 
+      - "15672:15672"  # For debugging purposes
+      - "5672:5672"
+  api:
+    build: 
+      context: api/
+      dockerfile: ./Dockerfile
+    secrets:
+      - source: conf
+        target: conf.json
+    depends_on:
+      - "rabbit"
+      - "mongo"
+    ports:
+      - 3000:3000

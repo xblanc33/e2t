@@ -8,7 +8,8 @@ export default class Authenticate extends React.Component {
 		super(props);
 
 		this.state = {
-			message: "",
+			signInMessage: "",
+			signUpMessage: "",
 			jwt: null
 		};
 
@@ -19,28 +20,37 @@ export default class Authenticate extends React.Component {
 	componentDidMount() {
 	}
 
-	async handleSignIn() {
+	async handleSignIn(event) {
+		event.preventDefault();
+
 		chrome.runtime.sendMessage({
 			kind: 'signIn' ,
 			credentials: {
 				username: document.getElementById('sign-in-username').value,
 				password: document.getElementById('sign-in-password').value
 			}
-		}, response => this.setState(() => response));
+		}, response => this.setState({
+			jwt: response.jwt,
+			signInMessage: response.message
+		}));
 	}
 
-	async handleSignUp(){
+	async handleSignUp(event){
+		event.preventDefault();
+
 		chrome.runtime.sendMessage({
 			kind: 'signUp' ,
 			credentials: {
 				username: document.getElementById('sign-up-username').value,
 				password: document.getElementById('sign-up-password').value
 			}
-		}, response => {chrome.extension.getBackgroundPage().console.log(`Handle signup response : ${response}`); this.setState(() => response);});
+		}, response => this.setState({signUpMessage: response.message}));
 	}
 
 
 	render() {
+
+		chrome.extension.getBackgroundPage().console.log(`State : ${JSON.stringify(this.state)}`);
 
 		if (this.state.isLoggedIn) {
 			return <Redirect to="/token"/>;
@@ -61,9 +71,9 @@ export default class Authenticate extends React.Component {
 								<FormControl id="sign-in-password" type="password" value={this.state.password}/>
 							</Col>
 						</FormGroup>
-						{this.state.message &&
+						{this.state.signInMessage &&
 							<FormGroup>
-								<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.message}</Alert></Col>
+								<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.signInMessage}</Alert></Col>
 							</FormGroup>
 						}
 						<FormGroup>
@@ -84,9 +94,9 @@ export default class Authenticate extends React.Component {
 							<FormControl id="sign-up-password" type="password" value={this.state.password}/>
 						</Col>
 					</FormGroup>
-					{this.state.message &&
+					{this.state.signUpMessage &&
 						<FormGroup>
-							<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.message}</Alert></Col>
+							<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.signUpMessage}</Alert></Col>
 						</FormGroup>
 					}
 					<FormGroup>

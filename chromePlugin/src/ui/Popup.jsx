@@ -4,6 +4,7 @@ import { PageHeader, Grid, Row, Col } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, browserHistory } from 'react-router-dom';
 
 import Authenticate from './Authenticate.jsx';
+import Token from './Token.jsx';
 
 class Popup extends React.Component {
 
@@ -26,6 +27,10 @@ class Popup extends React.Component {
 							<Route
 								exact path="/popup.html"
 								render={(props) => <Authenticate {...props} />}
+							/>
+							<Route 
+								path="/token"
+								render={(props) => <Token {...props} />}
 							/>
 						</Col>
 					</Row>

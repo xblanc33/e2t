@@ -5,7 +5,6 @@ const ObjectID = require('mongodb').ObjectID;
 const crypto = require('crypto');
 const sha256 = require('js-sha256');
 
-const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const passportJWT = require('passport-jwt');
 
@@ -28,7 +27,7 @@ class RouteAuthenticate {
             secretOrKey : process.env.JWT_SECRET
         };
 
-        let router = express.Router({ mergeParams: true });  // mergeParams to retrieve parent route params
+        let router = express.Router();
         router.post('/user', this.signup);
         router.post('/session', this.signin);
 
@@ -39,8 +38,6 @@ class RouteAuthenticate {
         let collection = this.mongo.db(this.dbName).collection(this.collectionName);
 
         let salt = crypto.randomBytes(256).toString('hex');
-        console.log(`req.password : ${req.password}`);
-        console.log(`req.body : ${req.body}`);
         let saltPassword = req.body.password + salt;
         let hash = sha256(saltPassword);
         let newUser = {
@@ -50,11 +47,12 @@ class RouteAuthenticate {
             hash : hash
         };
 
+        
         let user = await collection.findOne({username: newUser.username});
         if (user) {
             res.status(409).send({message: "Username already exists"}).end();
         } else {
-            await collection.save(newUser)
+            await collection.insertOne(newUser)
                 .catch(err => res.status(500).send(err).end());
             res.send({message: "Signup successful"}).end();
         }

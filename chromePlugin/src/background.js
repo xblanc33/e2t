@@ -11,8 +11,7 @@ class Background {
         chrome.runtime.onMessage.addListener(this.handleMessage);
     }
 
-    handleMessage(msg, sender, sendResponse) {
-        chrome.extension.getBackgroundPage().console.log(`Background handleMessage kind : ${msg.kind}`);
+    handleMessage(msg, sender, sendResponse) {  //TODO There should be a way to remove code there
         switch (msg.kind) {
 
         case 'signIn':
@@ -25,7 +24,6 @@ class Background {
             return true;
 
         case 'signUp':
-            chrome.extension.getBackgroundPage().console.log(`Calling Services.signup from background.js`);
             Services.signup(msg.credentials)
                 .then(response => sendResponse(response))
                 .catch(e => {
@@ -33,7 +31,26 @@ class Background {
                     sendResponse(false);
                 });
             return true;
+
+        case 'createCampaign':
+            Services.createCampaign()
+                .then(response => sendResponse(response))
+                .catch(e => {
+                    console.error(e.stack);
+                    sendResponse(false);
+                });
+            return true;
+
+        case 'joinCampaign':
+            Services.joinCampaign(msg.data)
+                .then(response => sendResponse(response))
+                .catch(e => {
+                    console.error(e.stack);
+                    sendResponse(false);
+                });
+            return true;
         }
+
     }
 }
 

@@ -3,6 +3,11 @@ const RouteCampaign = require('./RouteCampaign');
 const RouteExpedition = require('./RouteExpedition');
 const RouteAuthenticate = require('./RouteAuthenticate');
 
+const passport = require('passport');
+const passportJWT = require('passport-jwt');
+const JwtStrategy = passportJWT.Strategy;  //TODO Check if there is a cleaner way of writing this
+const ExtractJwt = passportJWT.ExtractJwt;
+
 const MongoClient = require('mongodb').MongoClient;
 
 const winston = require('winston');
@@ -23,6 +28,9 @@ const DB_NAME = 'e2t';
     let mongo = await initMongo(MONGO_URL);
 
     let app = express();
+    app.use(passport.initialize());
+    await setJWTStrategy(mongo);
+    app.use(express.json());
 
     app.use('/campaign', await new RouteCampaign(mongo, DB_NAME, 'campaign').init());
     app.use('/campaign/:campaignId/expedition', await new RouteExpedition(mongo, DB_NAME, 'expedition').init());
@@ -30,6 +38,28 @@ const DB_NAME = 'e2t';
 
     app.listen(3000, logger.info('E2T api listening on port 3000'));
 })();
+
+async function setJWTStrategy(mongo) {
+    let jwtOptions = {
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: process.env.JWT_SECRET
+    };
+
+    var strategy = new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
+
+        let collection = mongo.db(DB_NAME).collection('authenticate');
+        let user = await collection.findOne({username:jwtPayload.username})
+            .catch(e => done(e.stack));
+        if (user) {
+            return done(null, user);
+        } else {
+            logger.info('user not found');
+            return done(null, false, {message:'Incorrect Login/Password'});
+        }
+    });
+    
+    passport.use(strategy);
+}
 
 /**
  * Wait for mongo to be available and initiate the connexion

@@ -1,4 +1,6 @@
 const express = require('express');
+const passport = require('passport');
+const ObjectID = require('mongodb').ObjectID;
 
 class RouteExpedition {
 
@@ -13,6 +15,7 @@ class RouteExpedition {
 
     async init(){
         let router = express.Router({ mergeParams: true });  // mergeParams to retrieve parent route params
+        router.use(passport.authenticate('jwt', {failureRedirect: '/login' , session:false}));  //TODO Redirect should be taken into account by the React routes
 
         router.post('/', this.add);
         router.get('/', this.list);
@@ -21,11 +24,40 @@ class RouteExpedition {
     }
 
     async add(req, res){
-        await res.send(`TODO Add a new expedition in the ${req.params.campaignId} campaign`);
+        let campaignCollection = this.mongo.db(this.dbName).collection('campaign');
+        let expeditionCollection = this.mongo.db(this.dbName).collection('expedition');
+        let explorator = req.user;
+        let events = req.body.events;
+        let campaign = await campaignCollection.findOne({_id: new ObjectID(req.params.campaignId)});
+
+        if(campaign && campaign.explorators.includes(explorator.username)){
+            await expeditionCollection.insertOne({_id: new ObjectID(), events: events});
+            res.send({message: 'Inserted new expedition'});
+        }
+        else{
+            res.send({message: 'Campaign doesn\'t exist or you didn\'t join it'});
+        }
     }
 
     async list(req, res){
-        await res.send(`TODO List all expeditions for the ${req.params.campaignId} campaign`);
+        let campaignCollection = this.mongo.db(this.dbName).collection('campaign');
+        let expeditionCollection = this.mongo.db(this.dbName).collection('expedition');
+        let explorator = req.user;
+        let campaign = await campaignCollection.findOne({_id: new ObjectID(req.params.campaignId)});
+
+        if(campaign && campaign.explorators.includes(explorator.username)){
+            let expeditions = await expeditionCollection.find({explorators: explorator.username}).toArray();
+            res.send({
+                expeditions: expeditions,
+                message: 'Successfully retrieved expeditions'
+            });
+        }
+        else{
+            res.send({
+                expeditions: [],
+                message: 'Campaign doesn\'t exist or you didn\'t join it'
+            });
+        }
     }
 }
 

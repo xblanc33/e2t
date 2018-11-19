@@ -3,7 +3,9 @@ let Services = require('./Services');
 
 class Background {
     constructor() {
-        chrome.extension.getBackgroundPage().console.log(`Log from popup.html`);
+        this.jwt = null;
+        this.campaignId = null;
+
         this.handleMessage = this.handleMessage.bind(this);
     }
 
@@ -14,9 +16,19 @@ class Background {
     handleMessage(msg, sender, sendResponse) {  //TODO There should be a way to remove code there
         switch (msg.kind) {
 
+        case 'getState':
+            sendResponse({
+                jwt: this.jwt,
+                campaignId: this.campaignId
+            });
+            return true;
+
         case 'signIn':
             Services.signin(msg.credentials)
-                .then(response => sendResponse(response))
+                .then(response => {
+                    sendResponse(response);
+                    this.jwt = response.jwt;
+                })
                 .catch(e => {
                     console.error(e.stack);
                     sendResponse(false);
@@ -33,8 +45,11 @@ class Background {
             return true;
 
         case 'createCampaign':
-            Services.createCampaign()
-                .then(response => sendResponse(response))
+            Services.createCampaign(this.jwt)
+                .then(response => {
+                    sendResponse(response);
+                    this.campaignId = response.campaignId;
+                })
                 .catch(e => {
                     console.error(e.stack);
                     sendResponse(false);
@@ -42,8 +57,11 @@ class Background {
             return true;
 
         case 'joinCampaign':
-            Services.joinCampaign(msg.data)
-                .then(response => sendResponse(response))
+            Services.joinCampaign(this.jwt, msg.campaignId)
+                .then(response => {
+                    sendResponse(response);
+                    this.campaignId = response.campaignId;
+                })
                 .catch(e => {
                     console.error(e.stack);
                     sendResponse(false);

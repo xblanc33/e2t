@@ -31,10 +31,14 @@ class RouteCampaign {
         let explorator = req.user;
 
         let id = new ObjectID();
-        await collection.insertOne({_id: id, explorators: [explorator.username]});
+        await collection.insertOne({
+            _id: id,
+            explorators: [explorator.username],
+            entropyValues: []
+        });
 
         res.send({
-            id: id,
+            campaignId: id,
             message: 'Successfully created new campaign'
         });
     }
@@ -65,17 +69,22 @@ class RouteCampaign {
         let campaign = await collection.findOne(mongoFilter);
         if(!campaign){
             res.send({
+                campaignId: null,
                 message: `The campaign with id ${req.params.campaignId} doesn't exist`
             });
         }
         else if(campaign.explorators.includes(explorator.username)){
             res.send({
+                campaignId: campaign._id,
                 message: 'You already joined this campaign'
             });
         }
         else{
             await collection.updateOne(mongoFilter, {$push: {explorators: explorator.username}});
-            res.send({message : 'Successfully joined the campaign'});
+            res.send({
+                campaignId: campaign._id,
+                message : 'Successfully joined the campaign'
+            });
         }
     }
 }

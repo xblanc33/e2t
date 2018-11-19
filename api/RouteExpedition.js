@@ -4,10 +4,11 @@ const ObjectID = require('mongodb').ObjectID;
 
 class RouteExpedition {
 
-    constructor(mongo, dbName, collectionName){
+    constructor(mongo, dbName, collectionName, rabbitChannel){
         this.mongo = mongo;
         this.dbName = dbName;
         this.collectionName = collectionName;
+        this.rabbitChannel = rabbitChannel;
 
         this.add = this.add.bind(this);
         this.list = this.list.bind(this);
@@ -31,7 +32,17 @@ class RouteExpedition {
         let campaign = await campaignCollection.findOne({_id: new ObjectID(req.params.campaignId)});
 
         if(campaign && campaign.explorators.includes(explorator.username)){
-            await expeditionCollection.insertOne({_id: new ObjectID(), events: events});
+            let expedition = {
+                _id: new ObjectID(),
+                events: events,
+                campaignId: campaign._id,
+                explorator: explorator.username
+            };
+
+            await expeditionCollection.insertOne(expedition);
+            await this.rabbitChannel.sendToQueue('expeditionQueue', Buffer.from(JSON.stringify(expedition)), {persistent: true},
+                (e, _) => {if(e) console.error(e.stack);});  
+
             res.send({message: 'Inserted new expedition'});
         }
         else{

@@ -4,12 +4,29 @@ import { PageHeader, Grid, Row, Col } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, browserHistory } from 'react-router-dom';
 
 import Authenticate from './Authenticate.jsx';
-import Token from './Token.jsx';
+import CampaignSelection from './CampaignSelection.jsx';
+import Record from './Record.jsx';
 
 class Popup extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			jwt: null,
+			campaignId: null,
+		};
+
+		this.setParentState = this.setParentState.bind(this);
+	}
+
+	componentDidMount() {
+		chrome.runtime.sendMessage({kind:'getState'}, response => this.setState(response));
+	}
+
+	setParentState(state){
+		chrome.extension.getBackgroundPage().console.log(`Setting state : ${JSON.stringify(state)}`);
+		this.setState(state);
 	}
 
 	render() {
@@ -26,11 +43,29 @@ class Popup extends React.Component {
 						<Col lg={12}>
 							<Route
 								exact path="/popup.html"
-								render={(props) => <Authenticate {...props} />}
+								render={(props) => <Authenticate
+									{...props}
+									jwt={this.state.jwt} 
+									setParentState={this.setParentState}
+								/>}
 							/>
 							<Route 
-								path="/token"
-								render={(props) => <Token {...props} />}
+								path="/campaign-selection"
+								render={(props) => <CampaignSelection
+									{...props}
+									jwt={this.state.jwt}
+									campaignId={this.state.campaignId}
+									setParentState={this.setParentState}
+								/>}
+							/>
+							<Route 
+								path="/record"
+								render={(props) => <Record
+									{...props}
+									jwt={this.state.jwt}
+									campaignId={this.state.campaignId}
+									setParentState={this.setParentState}
+								/>}
 							/>
 						</Col>
 					</Row>

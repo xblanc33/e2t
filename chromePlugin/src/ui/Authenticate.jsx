@@ -10,7 +10,6 @@ export default class Authenticate extends React.Component {
 		this.state = {
 			signInMessage: "",
 			signUpMessage: "",
-			jwt: null
 		};
 
 		this.handleSignIn = this.handleSignIn.bind(this);
@@ -29,10 +28,10 @@ export default class Authenticate extends React.Component {
 				username: document.getElementById('sign-in-username').value,
 				password: document.getElementById('sign-in-password').value
 			}
-		}, response => this.setState({
-			jwt: response.jwt,
-			signInMessage: response.message
-		}));
+		}, response => {
+			this.setState({signInMessage: response.message});
+			this.props.setParentState({jwt: response.jwt});
+		});
 	}
 
 	async handleSignUp(event){
@@ -49,63 +48,57 @@ export default class Authenticate extends React.Component {
 
 
 	render() {
-
-		chrome.extension.getBackgroundPage().console.log(`State : ${JSON.stringify(this.state)}`);
-
-		if (this.state.isLoggedIn) {
-			return <Redirect to="/token"/>;
-		}
-		else {
-			return (
-				<div>
-					<Form horizontal onSubmit={this.handleSignIn}>
-						<FormGroup>
-							<Col xs={2}><ControlLabel>Username</ControlLabel></Col>
-							<Col xs={10}>
-								<FormControl id="sign-in-username" type="text" value={this.state.username}/>
-							</Col>
-						</FormGroup>
-						<FormGroup>
-							<Col xs={2}><ControlLabel>Password</ControlLabel></Col>
-							<Col xs={10}>
-								<FormControl id="sign-in-password" type="password" value={this.state.password}/>
-							</Col>
-						</FormGroup>
-						{this.state.signInMessage &&
-							<FormGroup>
-								<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.signInMessage}</Alert></Col>
-							</FormGroup>
-						}
-						<FormGroup>
-							<Col xsOffset={2} xs={10}><Button id="signInButton" bsStyle="primary" type="submit">Sign-In</Button></Col>
-						</FormGroup>
-					</Form>
-
-					<Form horizontal onSubmit={this.handleSignUp}>
+		if (this.props.jwt) {
+			return <Redirect to="/campaign-selection"/>;
+		} 
+		return (
+			<div>
+				<Form horizontal onSubmit={this.handleSignIn}>
 					<FormGroup>
 						<Col xs={2}><ControlLabel>Username</ControlLabel></Col>
 						<Col xs={10}>
-							<FormControl id="sign-up-username" type="text" value={this.state.username}/>
+							<FormControl id="sign-in-username" type="text" value={this.state.username}/>
 						</Col>
 					</FormGroup>
 					<FormGroup>
 						<Col xs={2}><ControlLabel>Password</ControlLabel></Col>
 						<Col xs={10}>
-							<FormControl id="sign-up-password" type="password" value={this.state.password}/>
+							<FormControl id="sign-in-password" type="password" value={this.state.password}/>
 						</Col>
 					</FormGroup>
-					{this.state.signUpMessage &&
+					{this.state.signInMessage &&
 						<FormGroup>
-							<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.signUpMessage}</Alert></Col>
+							<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.signInMessage}</Alert></Col>
 						</FormGroup>
 					}
 					<FormGroup>
-						<Col xsOffset={2} xs={10}><Button id="signUpButton" bsStyle="primary" type="submit">Sign-Up</Button></Col>
+						<Col xsOffset={2} xs={10}><Button id="signInButton" bsStyle="primary" type="submit">Sign-In</Button></Col>
 					</FormGroup>
-					</Form>
-				</div>
-			);
-		}
+				</Form>
 
+				<Form horizontal onSubmit={this.handleSignUp}>
+				<FormGroup>
+					<Col xs={2}><ControlLabel>Username</ControlLabel></Col>
+					<Col xs={10}>
+						<FormControl id="sign-up-username" type="text" value={this.state.username}/>
+					</Col>
+				</FormGroup>
+				<FormGroup>
+					<Col xs={2}><ControlLabel>Password</ControlLabel></Col>
+					<Col xs={10}>
+						<FormControl id="sign-up-password" type="password" value={this.state.password}/>
+					</Col>
+				</FormGroup>
+				{this.state.signUpMessage &&
+					<FormGroup>
+						<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.signUpMessage}</Alert></Col>
+					</FormGroup>
+				}
+				<FormGroup>
+					<Col xsOffset={2} xs={10}><Button id="signUpButton" bsStyle="primary" type="submit">Sign-Up</Button></Col>
+				</FormGroup>
+				</Form>
+			</div>
+		);
 	}
 }

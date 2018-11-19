@@ -16,7 +16,7 @@ services:
     image: "rabbitmq:3-management"
     ports: 
       - "15672:15672"  # For debugging purposes
-      - "5672:5672"
+      - "5672:5672"  # For debugging purposes
   api:
     build: 
       context: api/
@@ -31,3 +31,10 @@ services:
       - 3000:3000
     environment:
       JWT_SECRET: 'localsercretstoredinpublicgithubthisisnotsosecret'
+  calculator:
+    build: 
+      context: calculator/
+      dockerfile: ./Dockerfile
+    depends_on:
+      - "rabbit"
+      - "mongo"

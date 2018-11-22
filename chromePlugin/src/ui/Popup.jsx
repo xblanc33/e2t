@@ -15,13 +15,16 @@ class Popup extends React.Component {
 		this.state = {
 			jwt: null,
 			campaignId: null,
+			expedition: {
+				events: null
+			}
 		};
 
 		this.setParentState = this.setParentState.bind(this);
 	}
 
 	componentDidMount() {
-		chrome.runtime.sendMessage({kind:'getState'}, response => this.setState(response));
+		chrome.runtime.sendMessage({kind:'getState'}, response => {chrome.extension.getBackgroundPage().console.log(`Got state : ${JSON.stringify(response)}`); this.setState(response);});
 	}
 
 	setParentState(state){
@@ -64,6 +67,7 @@ class Popup extends React.Component {
 									{...props}
 									jwt={this.state.jwt}
 									campaignId={this.state.campaignId}
+									expedition={this.state.expedition}
 									setParentState={this.setParentState}
 								/>}
 							/>

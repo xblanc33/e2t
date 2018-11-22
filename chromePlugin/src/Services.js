@@ -33,6 +33,14 @@ class Services {
             .catch(e => console.error(e.stack));
         return response.data;
     }
+
+    static async publishExpedition(jwt, expedition, campaignId){
+        let response = await axios.post(`${BASE_URL}/campaign/${campaignId}/expedition`, {
+            events: expedition.events
+        }, {headers: {'Authorization': `Bearer ${jwt}`}})
+            .catch(e => console.error(e.stack));
+        return response.data;
+    }
 }
 
 module.exports = Services;

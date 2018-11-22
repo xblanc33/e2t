@@ -27,10 +27,6 @@ export default class CampaignSelection extends React.Component {
 			chrome.extension.getBackgroundPage().console.log(`Create response : ${JSON.stringify(response)}`);
 			this.props.setParentState({campaignId: response.campaignId});
 		});
-
-		if(reponse.campaignId){
-			browserHistory.push('/record');
-		}
 	}
 
 	async handleJoin(event) {

@@ -12,6 +12,7 @@ class RouteCampaign {
         this.create = this.create.bind(this);
         this.list = this.list.bind(this);
         this.join = this.join.bind(this);
+        this.getEntropies = this.getEntropies.bind(this);
     }
 
     async init(){
@@ -22,6 +23,7 @@ class RouteCampaign {
         router.get('/', this.list);  // TODO Can a user lists all campaigns or only those he participates in ?
         
         router.put('/:campaignId', this.join);  // PUT method here because we join the campaign
+        router.get('/:campaignId/entropy', this.getEntropies);
 
         return router;
     }
@@ -84,6 +86,28 @@ class RouteCampaign {
             res.send({
                 campaignId: campaign._id,
                 message : 'Successfully joined the campaign'
+            });
+        }
+    }
+
+    async getEntropies(req, res){
+        let campaignCollection = this.mongo.db(this.dbName).collection('campaign');
+        let expeditionCollection = this.mongo.db(this.dbName).collection('expedition');
+        let explorator = req.user;
+        let campaign = await campaignCollection.findOne({_id: new ObjectID(req.params.campaignId)});
+
+        if(campaign && campaign.explorators.includes(explorator.username)){
+            let expeditions = await expeditionCollection.find({campaignId: new ObjectID(req.params.campaignId)}).toArray();
+            let entropyValues = expeditions.map(expedition => expedition.entropyValue);
+            res.send({
+                entropyValues: entropyValues,
+                message: 'Successfully retrieved entropyValues'
+            });
+        }
+        else{
+            res.send({
+                entropyValues: [],
+                message: 'Campaign doesn\'t exist or you didn\'t join it'
             });
         }
     }

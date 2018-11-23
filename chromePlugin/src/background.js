@@ -87,7 +87,7 @@ class Background {
             }
             break;
 
-        case 'publishExpedition':
+        case 'publishExpedition':  // TODO Add url to the expedition object
             Services.publishExpedition(this.jwt, this.expedition, msg.campaignId)
                 .then(response => {
                     sendResponse(response);
@@ -102,6 +102,17 @@ class Background {
         case 'deleteExpedition':
             this.expedition.events = null;
             break;
+
+        case 'getEntropies':
+            Services.getEntropies(this.jwt, msg.campaignId)
+                .then(response => {
+                    sendResponse(response);
+                })
+                .catch(e => {
+                    console.error(e.stack);
+                    sendResponse(false);
+                });
+            return true;
         }
     }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ButtonToolbar, Button } from 'react-bootstrap';
+import Entropy from './Entropy.jsx';
 
 export default class Record extends React.Component {  // TODO
 	constructor(props) {
@@ -55,6 +56,9 @@ export default class Record extends React.Component {  // TODO
         return (
             <div>
                 <p>Campaign ID : {this.props.campaignId}</p>
+                <Entropy
+                    campaignId={this.props.campaignId}
+                />
                 {buttonToolbar}
             </div>
         );

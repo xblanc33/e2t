@@ -57,7 +57,7 @@ class RouteExpedition {
         let campaign = await campaignCollection.findOne({_id: new ObjectID(req.params.campaignId)});
 
         if(campaign && campaign.explorators.includes(explorator.username)){
-            let expeditions = await expeditionCollection.find({explorators: explorator.username}).toArray();
+            let expeditions = await expeditionCollection.find({explorator: explorator.username, campaignId: new ObjectID(req.params.campaignId)}).toArray();
             res.send({
                 expeditions: expeditions,
                 message: 'Successfully retrieved expeditions'

@@ -41,6 +41,12 @@ class Services {
             .catch(e => console.error(e.stack));
         return response.data;
     }
+
+    static async getEntropies(jwt, campaignId){  // TODO Check how do we represent entropy ? This may not be related to expedition but to campaign
+        let response = await axios.get(`${BASE_URL}/campaign/${campaignId}/entropy`, {headers: {'Authorization': `Bearer ${jwt}`}})
+            .catch(e => console.error(e.stack));
+        return response.data;
+    }
 }
 
 module.exports = Services;

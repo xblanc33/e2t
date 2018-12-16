@@ -27,6 +27,7 @@ class RouteCampaign {
 
         collection.insertOne({
             _id: uuid,
+            uuid : uuid,
             createdAt : new Date(),
             lastUpdate : new Date(),
             expedition : [],

@@ -13,23 +13,23 @@ const logger = winston.createLogger({
 });
 
 class Cartographer {
-    constructor() {
-        this.mongoUrl = `mongodb://mongo:27017`;
+    constructor(URL) {
+        this.mongoUrl = `mongodb://${MONGO.URL}:27017`;
+        this.rmqUrl = `amqp://${URL.RABBIT}`
         this.dbName = 'e2t';
         this.expeditionQueue = 'expeditionQueue';
+        this.entropyCampaignManagerMap = new Map();
     }
 
     async start() {
-        let mongo = await MongoClient.connect(this.mongoUrl, { useNewUrlParser: true });
-        this.expeditionCollection = mongo.db(this.dbName).collection("expedition");
-        this.campaignCollection = mongo.db(this.dbName).collection('campaign');
-
-        this.channel = await initRabbit(this.rmqUrl = `amqp://rabbit`, [this.expeditionQueue]);
+        this.mongoClient = await createConnectedMongoClient(this.mongoUrl);
+        this.channel = await createRabbitChannelAndCreateQueue(this.rmqUrl, [this.expeditionQueue]);
         try {
             this.channel.prefetch(1);
-            this.channel.consume(this.expeditionQueue, async msg => {
+            this.channel.consume(this.expeditionQueue, msg => {
                 if (msg !== null) {
-                    await this.performJob(msg);
+                    let expedition = JSON.parse(msg.content.toString());
+                    this.handleExpeditionCreation(expedition);
                 }
             });
         }
@@ -38,15 +38,19 @@ class Cartographer {
         }
     }
 
-    async performJob(msg){
+    handleExpeditionCreation(expedition){
+        logger.info(`Received new expedition with id ${expedition.uuid}`);
+        let collection = this.mongoClient.db(this.dbName).collection('expedition');
+        expedition._id = expedition.uuid;
+        collection.insertOne(expedition);
 
-        let limit = 20;  // Number of expeditions that you want to retrieve from the db in order to do the entropy calculation
+        let manager = this.entropyCampaignManagerMap.get(expedition.campaignId);
+        if (manager === undefined) {
+            manager = new entropyCampaignManager(expedition.campaignId);
+            this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
+        }
 
-        let expedition = JSON.parse(msg.content.toString());
-        logger.info(`Received expedition id ${expedition._id}`);
-
-        let expeditions = await this.getExpeditions(expedition.campaignId, limit);
-
+        let freshEntropy = manager.updateEntropty(expedition);
         ///////////////////
         let entropyValue = Math.round(Math.random()*100);  // Here, perform the entropy calculation
         ///////////////////
@@ -84,12 +88,23 @@ class Cartographer {
 
 module.exports = Calculator;
 
-/**
- * Wait for rabbit to be available, initiate connection and create queues if needed
- * @param {string} rmqUrl
- * @param {string[]} queuesList 
- */
-async function initRabbit(rmqUrl, queueList) {
+async function createConnectedMongoClient(mongoUrl) {
+    logger.info("Waiting for MongoDB...");
+    let mongoClient = null;
+    while (!mongoClient) {
+        try {
+            mongoClient = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
+        }
+        catch (e) {  //TODO Catch a lower exception, so that we don't miss an important one...
+            logger.debug(e.stack);
+            await new Promise((resolve, _) => setTimeout(resolve, 5000));
+        }
+    }
+    logger.info("Successfully connected to MongoDB");
+    return mongoClient;
+}
+
+async function createRabbitChannelAndCreateQueue(rmqUrl, queueList) {
     logger.info("Waiting for RabbitMQ...");
     let channel = null;
     while (!channel) {
@@ -101,7 +116,6 @@ async function initRabbit(rmqUrl, queueList) {
             }
         }
         catch (e) {  //TODO Catch a lower exception, so that we don't miss an important one...
-            console.error(e.stack);
             logger.debug(e.stack);
             await new Promise((resolve, _) => setTimeout(resolve, 5000));
         }

@@ -1,5 +1,9 @@
 const Calculator = require('./Calculator');
+const URL = {
+    MONGO :'localhost',
+    RABBIT : 'localhost'
+}
 
 (async () => {
-    new Calculator().start();
+    new Calculator(URL).start();
 })();

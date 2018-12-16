@@ -22,7 +22,7 @@ const QUEUES_LIST = ['expeditionQueue'];
 
 (async() => {
     let mongoClient = await createConnectedMongoClient(MONGO_URL);
-    let rabbitChannel = await initRabbit(RABBIT_URL, QUEUES_LIST);
+    let rabbitChannel = await createRabbitChannelAndCreateQueue(RABBIT_URL, QUEUES_LIST);
 
     let app = express();
     app.use(express.json());
@@ -50,12 +50,7 @@ async function createConnectedMongoClient(mongoUrl) {
     return mongoClient;
 }
 
-/**
- * Wait for rabbit to be available, initiate connection and create queues if needed
- * @param {string} rmqUrl
- * @param {string[]} queuesList 
- */
-async function initRabbit(rmqUrl, queueList) {
+async function createRabbitChannelAndCreateQueue(rmqUrl, queueList) {
     logger.info("Waiting for RabbitMQ...");
     let channel = null;
     while (!channel) {

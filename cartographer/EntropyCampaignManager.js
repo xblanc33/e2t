@@ -1,4 +1,3 @@
-const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const Ngram = require('./Ngram');
 
@@ -30,52 +29,52 @@ class EntropyCampaignManager {
                     previousEventSeq[previousIndex-previousFrom] = expedition.events[previousIndex];
                 }
             }
-            probabilitySum = probabilitySum + Math.log2(computeProbability(previousEventSeq, nextItem));
+            probabilitySum = probabilitySum + Math.log2(this.computeProbability(previousEventSeq, nextItem));
         }
         return probabilitySum / expedition.events.length;
     }
 
     computeProbability(previousEventSeq, nextItem) {
-        let ngram = ngramMap.get(hashNGram(previousEventSeq));
+        let ngram = this.ngramMap.get(hashNGram(previousEventSeq));
         if (ngram === undefined) return 0;
         return ngram.getSuccessorProbability(hashItem(nextItem));
     }
 
-    updateModel(exploration) {
-        if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong exploration";
-        for (let index = 0; index < exploration.events.length; index++) {
-            let previousFrom = Math.max(0,index - this.deepth);
-            let ngram = [];
+    updateModel(expedition) {
+        if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong expedition";
+        for (let index = 0; index < expedition.events.length; index++) {
+            let nextItem = expedition.events[index];
+            let previousEventSeq = [];
             if (index > 0) {
+                let previousFrom = Math.max(0,index - this.deepth);
                 for (let previousIndex = previousFrom; previousIndex < index; previousIndex++) {
-                    ngram[previousIndex-previousFrom] = exploration.events[previousIndex];
+                    previousEventSeq[previousIndex-previousFrom] = expedition.events[previousIndex];
                 }
             }
-            probabilitySum = probabilitySum + Math.log2(computeProbability(exploration.events[index],ngram));
+            this.updateProbability(previousEventSeq, nextItem);
         }
-        return probabilitySum / exploration.events.length;
     }
 
     updateProbability(previousEventSeq, nextItem) {
         let hashPreviousEventSeq = hashNGram(previousEventSeq);
-        let ngram = ngramMap.get(hashPreviousEventSeq);
+        let ngram = this.ngramMap.get(hashPreviousEventSeq);
         if (ngram === undefined) {
             ngram = new Ngram(hashPreviousEventSeq);
-            ngramMap.set(hashPreviousEventSeq, ngram);
+            this.ngramMap.set(hashPreviousEventSeq, ngram);
         }
         ngram.updateSuccessorOccurence(hashItem(nextItem));
-    }
-
-    hashItem(event) {
-        return hashCode(event.type+event.selector);
-    }
-
-    hashNGram(eventSeq) {
-        return hashCode(eventSeq.map( event => {hashItem(event)}).join());
     }
 }
 
 module.exports = EntropyCampaignManager;
+
+function hashItem(event) {
+    return hashCode(event.type+event.selector);
+}
+
+function hashNGram(eventSeq) {
+    return hashCode(eventSeq.map( event => {hashItem(event)}).join());
+}
 
 function hashCode(s) {
     let h;

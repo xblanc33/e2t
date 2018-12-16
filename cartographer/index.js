@@ -1,9 +1,9 @@
-const Calculator = require('./Calculator');
+const Cartographer = require('./Cartographer');
 const URL = {
     MONGO :'localhost',
     RABBIT : 'localhost'
-}
+};
 
-(async () => {
-    new Calculator(URL).start();
+(async() => {
+    new Cartographer(URL).start();
 })();

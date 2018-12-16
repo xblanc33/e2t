@@ -1,7 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const amqp = require('amqplib');
-const {ObjectId} = require('mongodb');
+const EntropyCampaignManager = require('./EntropyCampaignManager');
+const DEEPTH = 4;
 
 const logger = winston.createLogger({
     level: 'info',
@@ -14,7 +15,7 @@ const logger = winston.createLogger({
 
 class Cartographer {
     constructor(URL) {
-        this.mongoUrl = `mongodb://${MONGO.URL}:27017`;
+        this.mongoUrl = `mongodb://${URL.MONGO}:27017`;
         this.rmqUrl = `amqp://${URL.RABBIT}`
         this.dbName = 'e2t';
         this.expeditionQueue = 'expeditionQueue';
@@ -28,8 +29,7 @@ class Cartographer {
             this.channel.prefetch(1);
             this.channel.consume(this.expeditionQueue, msg => {
                 if (msg !== null) {
-                    let expedition = JSON.parse(msg.content.toString());
-                    this.handleExpeditionCreation(expedition);
+                    this.handleExpeditionCreation(msg);
                 }
             });
         }
@@ -38,30 +38,40 @@ class Cartographer {
         }
     }
 
-    handleExpeditionCreation(expedition){
+    handleExpeditionCreation(msg){
+        let expedition = JSON.parse(msg.content.toString());
         logger.info(`Received new expedition with id ${expedition.uuid}`);
         let collection = this.mongoClient.db(this.dbName).collection('expedition');
         expedition._id = expedition.uuid;
-        collection.insertOne(expedition);
+        collection.insertOne(expedition).catch(ex => {
+            winston.error(`can't save expedition : ${JSON.stringify(ex)}`);
+        });
 
         let manager = this.entropyCampaignManagerMap.get(expedition.campaignId);
         if (manager === undefined) {
-            manager = new entropyCampaignManager(expedition.campaignId);
+            manager = new EntropyCampaignManager(expedition.campaignId, DEEPTH);
             this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
         }
 
         let crossEntropy = manager.crossEntropy(expedition);
+        logger.info(`CrossEntropy ${crossEntropy}`);
         manager.updateModel(expedition);
 
-        await this.addEntropy(expedition.campaignId, entropyValue);
-        await this.setEntropy(expedition._id, entropyValue);
-        
-        this.channel.ack(msg);
-        logger.info(`Set expedition ${expedition._id} with value ${entropyValue}`);
+        this.addEntropy(expedition.campaignId, crossEntropy)
+            .then( () => {
+                logger.info(`Save cross entropy`);
+                this.channel.ack(msg);
+            })
+            .catch( (ex) => {
+                logger.error(`exception saving entropy ${JSON.stringify(ex)}`);
+                this.channel.nack(msg);
+            })
     }
 
-    async addEntropy(campaignId, entropyValue){
-        await this.campaignCollection.updateOne({_id: new ObjectId(campaignId)}, {$push: {entropyValues: entropyValue}});
+    addEntropy(campaignId, entropyValue){
+        return this.mongoClient.db(this.dbName)
+            .collection('campaign')
+            .updateOne({_id: campaignId}, {$push: {crossentropy: entropyValue}});
     }
 
 

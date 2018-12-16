@@ -31,7 +31,7 @@ class RouteCampaign {
             createdAt : new Date(),
             lastUpdate : new Date(),
             expedition : [],
-            entropy : []
+            crossentropy : []
         })
         .then(document => {
             res.status(201).send({

@@ -50,10 +50,8 @@ class Cartographer {
             this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
         }
 
-        let freshEntropy = manager.updateEntropty(expedition);
-        ///////////////////
-        let entropyValue = Math.round(Math.random()*100);  // Here, perform the entropy calculation
-        ///////////////////
+        let crossEntropy = manager.crossEntropy(expedition);
+        manager.updateModel(expedition);
 
         await this.addEntropy(expedition.campaignId, entropyValue);
         await this.setEntropy(expedition._id, entropyValue);
@@ -62,31 +60,14 @@ class Cartographer {
         logger.info(`Set expedition ${expedition._id} with value ${entropyValue}`);
     }
 
-    async getExpeditions(campaignId, limit) {
-        let expeditions = await this.expeditionCollection
-            .find({ campaignId: campaignId })
-            .sort({ _id: 1 })  // TODO Check that for the last n, it is not -1 instead of 1
-            .limit(limit)
-            .toArray();
-        return expeditions;
-    }
-
     async addEntropy(campaignId, entropyValue){
         await this.campaignCollection.updateOne({_id: new ObjectId(campaignId)}, {$push: {entropyValues: entropyValue}});
     }
 
-    async setEntropy(expeditionId, entropyValue) {
-        await this.expeditionCollection.updateOne(
-            { _id: ObjectId(expeditionId) }, {
-                $set: {
-                    entropyValue: entropyValue
-                }
-            });
-    }
 
 }
 
-module.exports = Calculator;
+module.exports = Cartographer;
 
 async function createConnectedMongoClient(mongoUrl) {
     logger.info("Waiting for MongoDB...");

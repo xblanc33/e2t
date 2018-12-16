@@ -12,7 +12,7 @@ const logger = winston.createLogger({
     )
 });
 
-class Calculator {
+class Cartographer {
     constructor() {
         this.mongoUrl = `mongodb://mongo:27017`;
         this.dbName = 'e2t';

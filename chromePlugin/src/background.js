@@ -3,14 +3,12 @@ let NavigationListener = require('./NavigationListener');
 
 class Background {
     constructor() {
-        this.jwt = null;
         this.campaignId = null;
         this.expedition = {
             events: null
         };
 
         this.handleMessage = this.handleMessage.bind(this);
-
         this.navigationListener = new NavigationListener();
     }
 
@@ -24,58 +22,39 @@ class Background {
 
         case 'getState':
             sendResponse({
-                jwt: this.jwt,
                 campaignId: this.campaignId,
                 expedition: this.expedition
             });
             return true;
 
-        case 'signIn':
-            Services.signin(msg.credentials)
-                .then(response => {
-                    sendResponse(response);
-                    this.jwt = response.jwt;
-                })
-                .catch(e => {
-                    console.error(e.stack);
-                    sendResponse(false);
-                });
-            return true;
-
-        case 'signUp':
-            Services.signup(msg.credentials)
-                .then(response => sendResponse(response))
-                .catch(e => {
-                    console.error(e.stack);
-                    sendResponse(false);
-                });
-            return true;
-
         case 'createCampaign':
-            Services.createCampaign(this.jwt)
+            //console.log('Background: createCampaign');        
+            Services.createCampaign()
                 .then(response => {
-                    sendResponse(response);
-                    this.campaignId = response.campaignId;
+                    //console.log('Backgournd: send response');
+                    sendResponse(response.data);
+                    this.campaignId = response.data.campaignId;
                 })
                 .catch(e => {
-                    console.error(e.stack);
+                    //console.error(e.stack);
                     sendResponse(false);
                 });
             return true;
 
         case 'joinCampaign':
-            Services.joinCampaign(this.jwt, msg.campaignId)
+            Services.joinCampaign(msg.campaignId)
                 .then(response => {
-                    sendResponse(response);
-                    this.campaignId = response.campaignId;
+                    sendResponse(response.data);
+                    this.campaignId = response.data.campaignId;
                 })
                 .catch(e => {
-                    console.error(e.stack);
+                    //console.error(e.stack);
                     sendResponse(false);
                 });
             return true;
 
         case 'startExpedition':
+            this.expedition.campaignId = this.campaignId;
             this.expedition.events = [];
             this.navigationListener.calibrate();
             break;
@@ -88,7 +67,7 @@ class Background {
             break;
 
         case 'publishExpedition':  // TODO Add url to the expedition object
-            Services.publishExpedition(this.jwt, this.expedition, msg.campaignId)
+            Services.publishExpedition(this.expedition)
                 .then(response => {
                     sendResponse(response);
                     this.expedition.events = null;

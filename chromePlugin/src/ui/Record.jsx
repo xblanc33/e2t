@@ -10,22 +10,22 @@ export default class Record extends React.Component {  // TODO
             message: ''
         };
         
-		this.clickStart = this.clickStart.bind(this);
-		this.clickPublish = this.clickPublish.bind(this);
-		this.clickDelete = this.clickDelete.bind(this);
+		this.handleStart = this.handleStart.bind(this);
+		this.handlePublish = this.handlePublish.bind(this);
+		this.handleDelete = this.handleDelete.bind(this);
 	}
 
 	componentDidMount() {
     }
     
-    clickStart(event) {
+    handleStart(event) {
         event.preventDefault();
         
 		chrome.runtime.sendMessage({ kind: 'startExpedition' });
 		this.props.setParentState({expedition: {events: []}});
 	}
 
-	clickPublish(event) {
+	handlePublish(event) {
 		event.preventDefault();
 
         chrome.runtime.sendMessage(
@@ -35,7 +35,7 @@ export default class Record extends React.Component {  // TODO
         this.props.setParentState({expedition: {events: null}});
     }
     
-    clickDelete(event) {
+    handleDelete(event) {
         event.preventDefault();
 
         chrome.runtime.sendMessage({kind: 'deleteExpedition'});
@@ -45,20 +45,20 @@ export default class Record extends React.Component {  // TODO
 	render() {
         let buttonToolbar = this.props.expedition.events?(  // True if the array is defined (even if empty)
             <ButtonToolbar>
-                <Button bsStyle="primary" onClick={this.clickPublish}>Publish</Button>
-                <Button bsStyle="danger" onClick={this.clickDelete}>Delete</Button>
+                <Button bsStyle="primary" onClick={this.handlePublish}>Publish</Button>
+                <Button bsStyle="danger" onClick={this.handleDelete}>Delete</Button>
             </ButtonToolbar>
         ):(
             <ButtonToolbar>
-                <Button bsStyle="primary" onClick={this.clickStart}>Record</Button>
+                <Button bsStyle="primary" onClick={this.handleStart}>Record</Button>
             </ButtonToolbar>
         );
         return (
             <div>
                 <p>Campaign ID : {this.props.campaignId}</p>
-                <Entropy
+                {/*<Entropy
                     campaignId={this.props.campaignId}
-                />
+                />*/}
                 {buttonToolbar}
             </div>
         );

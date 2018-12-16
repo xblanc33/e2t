@@ -3,7 +3,6 @@ import { render } from 'react-dom';
 import { PageHeader, Grid, Row, Col } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, browserHistory } from 'react-router-dom';
 
-import Authenticate from './Authenticate.jsx';
 import CampaignSelection from './CampaignSelection.jsx';
 import Record from './Record.jsx';
 
@@ -13,7 +12,6 @@ class Popup extends React.Component {
 		super(props);
 
 		this.state = {
-			jwt: null,
 			campaignId: null,
 			expedition: {
 				events: null
@@ -38,25 +36,16 @@ class Popup extends React.Component {
 				<Grid fluid={true}>
 					<Row>
 						<Col lg={12}>
-							<PageHeader>E2T | Exploratory Testing Tool</PageHeader>
-							<p className="lead">Record your test expeditions.</p>
+							<PageHeader>E2T</PageHeader>
+							<p className="lead">Test Exploration</p>
 						</Col>
 					</Row>
 					<Row>
 						<Col lg={12}>
 							<Route
 								exact path="/popup.html"
-								render={(props) => <Authenticate
-									{...props}
-									jwt={this.state.jwt} 
-									setParentState={this.setParentState}
-								/>}
-							/>
-							<Route 
-								path="/campaign-selection"
 								render={(props) => <CampaignSelection
 									{...props}
-									jwt={this.state.jwt}
 									campaignId={this.state.campaignId}
 									setParentState={this.setParentState}
 								/>}
@@ -65,7 +54,6 @@ class Popup extends React.Component {
 								path="/record"
 								render={(props) => <Record
 									{...props}
-									jwt={this.state.jwt}
 									campaignId={this.state.campaignId}
 									expedition={this.state.expedition}
 									setParentState={this.setParentState}

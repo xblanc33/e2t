@@ -17,19 +17,20 @@ export default class CampaignSelection extends React.Component {
 	componentDidMount() {
 	}
 
-	async handleCreate(event){
+	handleCreate(event){
         event.preventDefault();
         
 		chrome.runtime.sendMessage({
 			kind: 'createCampaign'
 		}, response => {
+			console.log('CampaignSelection: create response');
 			this.setState({message: response.message});
 			chrome.extension.getBackgroundPage().console.log(`Create response : ${JSON.stringify(response)}`);
 			this.props.setParentState({campaignId: response.campaignId});
 		});
 	}
 
-	async handleJoin(event) {
+	handleJoin(event) {
 		event.preventDefault();
 
 		let campaignId = document.getElementById('campaignId').value;
@@ -63,7 +64,7 @@ export default class CampaignSelection extends React.Component {
 						</FormGroup>
 					}
 					<FormGroup>
-						<Col xsOffset={2} xs={10}><Button id="joinButton" bsStyle="primary" type="submit">Join existing Campaign</Button></Col>
+						<Col xsOffset={2} xs={10}><Button id="joinButton" bsStyle="primary" type="submit">Or Join existing Campaign</Button></Col>
 					</FormGroup>
 				</Form>
 			</div>

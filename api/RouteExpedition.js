@@ -25,13 +25,15 @@ class RouteExpedition {
         let expedition = req.body.expedition;
         expedition.uuid = uuidv4();
 
-        this.rabbitChannel.sendToQueue('expeditionQueue', Buffer.from(JSON.stringify(expedition)))
-        .then( () => {
-            res.status(200).send(JSON.stringify(expedition));
-        })
-        .catch( ex => {
-            res.status(500).send(JSON.stringify(ex));
-        });
+        this.rabbitChannel.sendToQueue('expeditionQueue'
+            , Buffer.from(JSON.stringify(expedition))
+            , (err,ok) => {
+                if (err)  {
+                    res.status(500).send(JSON.stringify(err));
+                } else {
+                    res.status(200).send(JSON.stringify(expedition));
+                }
+            });
     }
 
     getExpedition(req, res){

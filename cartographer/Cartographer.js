@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const amqp = require('amqplib');
 const EntropyCampaignManager = require('./EntropyCampaignManager');
-const DEEPTH = 4;
+const DEEPTH = 1;
 
 const logger = winston.createLogger({
     level: 'info',

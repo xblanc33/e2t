@@ -14,6 +14,7 @@ class Ngram {
         let occurence = this.successorMap.get(eventHash);
         occurence === undefined ? occurence = 1 : occurence++ ;
         this.successorMap.set(eventHash, occurence);
+        this.size++;
     }
 }
 

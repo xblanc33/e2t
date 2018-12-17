@@ -11,9 +11,9 @@ const logger = winston.createLogger({
 });
 
 class EntropyCampaignManager {
-    constructor(campaignId, deepth) {
+    constructor(campaignId, depth) {
         this.campaignId = campaignId;
-        this.deepth = deepth;
+        this.depth = depth;
         this.ngramMap = new Map();
     }
 
@@ -21,14 +21,8 @@ class EntropyCampaignManager {
         if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong expedition";
         let probabilitySum = 0;
         for (let index = 0; index < expedition.events.length; index++) {
-            let nextItem = expedition.events[index];
-            let previousEventSeq = [];
-            if (index > 0) {
-                let previousFrom = Math.max(0,index - this.deepth);
-                for (let previousIndex = previousFrom; previousIndex < index; previousIndex++) {
-                    previousEventSeq.push(expedition.events[previousIndex]);
-                }
-            }
+            let nextItem = eventSet[index];
+            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.depth);
             probabilitySum = probabilitySum + Math.log2(this.computeProbability(previousEventSeq, nextItem));
         }
         return -(probabilitySum / expedition.events.length);
@@ -44,14 +38,8 @@ class EntropyCampaignManager {
         if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong expedition";
         logger.info(`update model with expedition ${JSON.stringify(expedition.events)}`)
         for (let index = 0; index < expedition.events.length; index++) {
-            let nextItem = expedition.events[index];
-            let previousEventSeq = [];
-            if (index > 0) {
-                let previousFrom = Math.max(0,index - this.deepth);
-                for (let previousIndex = previousFrom; previousIndex < index; previousIndex++) {
-                    previousEventSeq.push(expedition.events[previousIndex]);
-                }
-            }
+            let nextItem = eventSet[index];
+            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.depth);
             this.updateProbability(previousEventSeq, nextItem);
         }
     }
@@ -85,9 +73,20 @@ function hashCode(s) {
     let hash = 0, i, chr;
     if (s.length === 0) return hash;
     for (i = 0; i < s.length; i++) {
-      chr   = s.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
+        chr   = s.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
     }
     return hash;
-  };
+}
+
+function createPreviousEventSeq(eventSet, index, depth) {
+    let previousEventSeq = [];
+    if (index > 0) {
+        let previousFrom = Math.max(0,index - depth);
+        for (let previousIndex = previousFrom; previousIndex < index; previousIndex++) {
+            previousEventSeq.push(eventSet[previousIndex]);
+        }
+    }
+    return previousEventSeq;
+}

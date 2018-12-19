@@ -2,7 +2,7 @@ const winston = require('winston');
 const Ngram = require('./Ngram');
 
 const DEFAULT_DEPTH = 3;
-const DEFAULT_PROBA_OF_UNKNOWN = 0;
+const DEFAULT_PROBA_OF_UNKNOWN = 0.10;
 
 const logger = winston.createLogger({
     level: 'info',
@@ -34,9 +34,9 @@ class EntropyCampaignManager {
 
     computeProbability(previousEventSeq, nextItem) {
         let ngram = this.ngramMap.get(hashNGram(previousEventSeq));
-        if (ngram === undefined) return this.PROBA_OF_UNKNOWN;
-        let proba = ngram.getSuccessorProbability(hashItem(nextItem)) * (1-this.PROBA_OF_UNKNOWN);
-        return proba;
+        if (ngram === undefined) return 1;
+        let proba = ngram.getSuccessorProbability(hashItem(nextItem));
+        return proba !== 0 ? proba * (1-this.PROBA_OF_UNKNOWN) : this.PROBA_OF_UNKNOWN;
     }
 
     updateModel(expedition) {

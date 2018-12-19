@@ -15,9 +15,9 @@ const logger = winston.createLogger({
     )
 });
 
-const MONGO_URL = 'mongodb://localhost:27017';
+const MONGO_URL = 'mongodb://mongo:27017';
 const DB_NAME = 'e2t';
-const RABBIT_URL = 'amqp://localhost';
+const RABBIT_URL = 'amqp://rabbit';
 const QUEUES_LIST = ['expeditionQueue'];
 
 (async() => {

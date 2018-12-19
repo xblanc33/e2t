@@ -2,7 +2,6 @@ const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const amqp = require('amqplib');
 const EntropyCampaignManager = require('./EntropyCampaignManager');
-const DEEPTH = 4;
 
 const logger = winston.createLogger({
     level: 'info',
@@ -14,11 +13,14 @@ const logger = winston.createLogger({
 });
 
 class Cartographer {
-    constructor(URL) {
+    constructor(URL, ENTROPY_OPTION) {
         this.mongoUrl = `mongodb://${URL.MONGO}:27017`;
-        this.rmqUrl = `amqp://${URL.RABBIT}`
+        this.rmqUrl = `amqp://${URL.RABBIT}`;
+        
         this.dbName = 'e2t';
         this.expeditionQueue = 'expeditionQueue';
+        
+        this.ENTROPY_OPTION = ENTROPY_OPTION;
         this.entropyCampaignManagerMap = new Map();
     }
 
@@ -49,7 +51,7 @@ class Cartographer {
 
         let manager = this.entropyCampaignManagerMap.get(expedition.campaignId);
         if (manager === undefined) {
-            manager = new EntropyCampaignManager(expedition.campaignId, DEEPTH);
+            manager = new EntropyCampaignManager(expedition.campaignId, this.ENTROPY_OPTION);
             this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
         }
 

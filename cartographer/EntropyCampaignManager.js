@@ -1,6 +1,9 @@
 const winston = require('winston');
 const Ngram = require('./Ngram');
 
+const DEFAULT_DEPTH = 3;
+const DEFAULT_PROBA_OF_UNKNOWN = 0;
+
 const logger = winston.createLogger({
     level: 'info',
     transports: [new winston.transports.Console(),],
@@ -11,9 +14,10 @@ const logger = winston.createLogger({
 });
 
 class EntropyCampaignManager {
-    constructor(campaignId, depth) {
+    constructor(campaignId, ENTROPY_OPTION) {
         this.campaignId = campaignId;
-        this.depth = depth;
+        this.DEPTH = ENTROPY_OPTION.DEPTH || DEFAULT_DEPTH;
+        this.PROBA_OF_UNKNOWN = ENTROPY_OPTION.PROBA_OF_UNKNOWN || DEFAULT_PROBA_OF_UNKNOWN;
         this.ngramMap = new Map();
     }
 
@@ -21,8 +25,8 @@ class EntropyCampaignManager {
         if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong expedition";
         let probabilitySum = 0;
         for (let index = 0; index < expedition.events.length; index++) {
-            let nextItem = eventSet[index];
-            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.depth);
+            let nextItem = expedition.events[index];
+            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.DEPTH);
             probabilitySum = probabilitySum + Math.log2(this.computeProbability(previousEventSeq, nextItem));
         }
         return -(probabilitySum / expedition.events.length);
@@ -30,16 +34,17 @@ class EntropyCampaignManager {
 
     computeProbability(previousEventSeq, nextItem) {
         let ngram = this.ngramMap.get(hashNGram(previousEventSeq));
-        if (ngram === undefined) return 0;
-        return ngram.getSuccessorProbability(hashItem(nextItem));
+        if (ngram === undefined) return this.PROBA_OF_UNKNOWN;
+        let proba = ngram.getSuccessorProbability(hashItem(nextItem)) * (1-this.PROBA_OF_UNKNOWN);
+        return proba;
     }
 
     updateModel(expedition) {
         if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong expedition";
         logger.info(`update model with expedition ${JSON.stringify(expedition.events)}`)
         for (let index = 0; index < expedition.events.length; index++) {
-            let nextItem = eventSet[index];
-            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.depth);
+            let nextItem = expedition.events[index];
+            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.DEPTH);
             this.updateProbability(previousEventSeq, nextItem);
         }
     }

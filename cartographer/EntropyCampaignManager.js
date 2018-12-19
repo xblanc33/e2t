@@ -34,7 +34,7 @@ class EntropyCampaignManager {
 
     computeProbability(previousEventSeq, nextItem) {
         let ngram = this.ngramMap.get(hashNGram(previousEventSeq));
-        if (ngram === undefined) return 1;
+        if (ngram === undefined) return this.PROBA_OF_UNKNOWN;
         let proba = ngram.getSuccessorProbability(hashItem(nextItem));
         return proba !== 0 ? proba * (1-this.PROBA_OF_UNKNOWN) : this.PROBA_OF_UNKNOWN;
     }

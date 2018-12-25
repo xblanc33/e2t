@@ -26,11 +26,7 @@ var config = {
 			{from: './dev/app/index.html', to: 'app/index.html'},
 			{from: './dev/app/google5d1e299f83dd09ef.html', to: 'app/google5d1e299f83dd09ef.html'},
 			{from: './dev/app/img/success.png', to: 'app/img/success.png'},
-			{from: './dev/app/img/failure.png', to: 'app/img/failure.png'},
-			{from: './dev/app/img/check.svg', to: 'app/img/check.svg'},
-			{from: './dev/app/img/replay.svg', to: 'app/img/replay.svg'},
-			{from: './dev/app/img/record.svg', to: 'app/img/record.svg'},
-			{from: './dev/app/img/github.png', to: 'app/img/github.png'}
+			{from: './dev/app/img/failure.png', to: 'app/img/failure.png'}
 		])
 	]
 };

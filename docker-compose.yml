@@ -30,3 +30,13 @@ services:
     depends_on:
       - "rabbit"
       - "mongo"
+  front:
+    build:
+      context: front/
+      dockerfile: ./Dockerfile
+    depends_on:
+      - "mongo"
+      - "api"
+    ports:
+      - 80:80
+

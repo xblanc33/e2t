@@ -15,6 +15,7 @@ const logger = winston.createLogger({
     )
 });
 
+const PORT = 3000;
 const MONGO_URL = 'mongodb://mongo:27017';
 const DB_NAME = 'e2t';
 const RABBIT_URL = 'amqp://rabbit';
@@ -27,10 +28,10 @@ const QUEUES_LIST = ['expeditionQueue'];
     let app = express();
     app.use(express.json());
 
-    app.use('/campaign', await new RouteCampaign(mongoClient, DB_NAME, 'campaign').init());
-    app.use('/expedition', await new RouteExpedition(mongoClient, DB_NAME, 'expedition', rabbitChannel).init());
+    app.use('/api/campaign', await new RouteCampaign(mongoClient, DB_NAME, 'campaign').init());
+    app.use('/api/expedition', await new RouteExpedition(mongoClient, DB_NAME, 'expedition', rabbitChannel).init());
 
-    app.listen(3000, logger.info('E2T api listening on port 3000'));
+    app.listen(PORT, logger.info('E2T api listening on port 3000'));
 })();
 
 

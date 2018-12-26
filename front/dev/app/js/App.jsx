@@ -2,6 +2,7 @@ import React from 'react';
 import {render} from 'react-dom';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
 import Home from './Home.jsx';
+import Campaign from './Campaign.jsx';
 
 class App extends React.Component {
 
@@ -13,7 +14,8 @@ class App extends React.Component {
 		return (
 			<Router >
 				<div>
-					<Route path="/:id" component={Home} />
+					<Route exact path="/" component={Home} />
+					<Route path="/:id" component={Campaign} />
 				</div>
 			</Router>
 		);

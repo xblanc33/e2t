@@ -1,5 +1,7 @@
 import React from 'react';
 import { Row } from 'react-bootstrap';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import {getCampaign} from './scenarioService.js';
 
 const REFRESH_TEMPO = 10000;
@@ -24,6 +26,7 @@ export default class Campaign extends React.Component {
 					//console.log('fetched');
 					this.setState({
 						campaign: campaign,
+						entropyList: campaign.crossentropy,
 						loaded: true
 					});
 				})
@@ -55,7 +58,6 @@ export default class Campaign extends React.Component {
 		if (this.state.campaignId) {
 			if (this.state.campaign) {
 				welcomeMsg = (<div>Campaign:</div>);
-				entropyList = this.state.campaign.crossentropy.map( (entropy) => <li>{entropy}</li>);
 			} else {
 				welcomeMsg = (<div>No campaign for this id</div>);
 			}
@@ -69,7 +71,33 @@ export default class Campaign extends React.Component {
 					{welcomeMsg}
 				</Row>
                 <Row>
-					<ul>{entropyList}</ul>
+					<HighchartsReact
+						highcharts={Highcharts}
+						options={{
+							chart: {
+								type: 'spline',
+								animation: Highcharts.svg,
+								height: 200
+							},
+							legend: {
+								enabled: false
+							},
+							credits: false,
+							title: null,
+							xAxis: {
+								type: 'datetime',
+								labels: {
+									enabled: false
+								}
+							},
+							yAxis: {
+								title: null
+							},
+							series: [{
+								data: this.state.entropyList
+							}]
+						}}
+					/>
                 </Row>
 			</div>
 		);

@@ -1,8 +1,8 @@
 const winston = require('winston');
 const Ngram = require('./Ngram');
 
-const DEFAULT_DEPTH = 3;
-const DEFAULT_PROBA_OF_UNKNOWN = 0.10;
+const DEFAULT_DEPTH = 4;
+const DEFAULT_PROBA_OF_UNKNOWN = 0.01;
 
 const logger = winston.createLogger({
     level: 'info',

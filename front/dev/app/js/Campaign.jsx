@@ -54,7 +54,6 @@ export default class Campaign extends React.Component {
 	
 	render() {
 		let welcomeMsg;
-		let entropyList;
 		if (this.state.campaignId) {
 			if (this.state.campaign) {
 				welcomeMsg = (<div>Campaign:</div>);

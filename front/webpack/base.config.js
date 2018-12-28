@@ -24,9 +24,7 @@ var config = {
 	plugins: [
 		new CopyPlugin([
 			{from: './dev/app/index.html', to: 'app/index.html'},
-			{from: './dev/app/google5d1e299f83dd09ef.html', to: 'app/google5d1e299f83dd09ef.html'},
-			{from: './dev/app/img/success.png', to: 'app/img/success.png'},
-			{from: './dev/app/img/failure.png', to: 'app/img/failure.png'}
+			{from: './dev/app/google5d1e299f83dd09ef.html', to: 'app/google5d1e299f83dd09ef.html'}
 		])
 	]
 };

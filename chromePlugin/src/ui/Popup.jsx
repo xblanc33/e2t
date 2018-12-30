@@ -10,54 +10,27 @@ class Popup extends React.Component {
 
 	constructor(props) {
 		super(props);
-
-		this.state = {
-			campaignId: null,
-			expedition: {
-				events: null
-			}
-		};
-
-		this.setParentState = this.setParentState.bind(this);
-	}
-
-	componentDidMount() {
-		chrome.runtime.sendMessage({kind:'getState'}, response => {chrome.extension.getBackgroundPage().console.log(`Got state : ${JSON.stringify(response)}`); this.setState(response);});
-	}
-
-	setParentState(state){
-		chrome.extension.getBackgroundPage().console.log(`Setting state : ${JSON.stringify(state)}`);
-		this.setState(state);
 	}
 
 	render() {
 		return (
 			<Router history={browserHistory}>
 				<Grid fluid={true}>
-					<Row>
-						<Col lg={12}>
+					<Row className="show-grid">
+						<Col xs={12} xsOffset={1}>
 							<PageHeader>E2T</PageHeader>
 							<p className="lead">Test Exploration</p>
 						</Col>
 					</Row>
-					<Row>
-						<Col lg={12}>
+					<Row className="show-grid">
+						<Col xs={12} xsOffset={1}>
 							<Route
 								exact path="/popup.html"
-								render={(props) => <CampaignSelection
-									{...props}
-									campaignId={this.state.campaignId}
-									setParentState={this.setParentState}
-								/>}
+								component={CampaignSelection}
 							/>
 							<Route 
 								path="/record"
-								render={(props) => <Record
-									{...props}
-									campaignId={this.state.campaignId}
-									expedition={this.state.expedition}
-									setParentState={this.setParentState}
-								/>}
+								component={Record}
 							/>
 						</Col>
 					</Row>

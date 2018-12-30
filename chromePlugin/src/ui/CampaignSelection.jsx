@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import { Form, Col, FormGroup, FormControl, ControlLabel, Button, Alert } from 'react-bootstrap';
+import { Row, Form, Col, FormGroup, FormControl, ControlLabel, Button, Alert } from 'react-bootstrap';
 
 export default class CampaignSelection extends React.Component {
 
@@ -8,65 +8,79 @@ export default class CampaignSelection extends React.Component {
 		super(props);
 		this.state = {
 			campaignId: null,
-			message: ''
+			message: 'plugin initialization'
 		};
 		this.handleJoin = this.handleJoin.bind(this);
 		this.handleCreate = this.handleCreate.bind(this);
 	}
 
 	componentDidMount() {
+		chrome.runtime.sendMessage(
+			{kind:'getState'}, 
+			response => {
+				chrome.extension.getBackgroundPage().console.log(`Got state : ${JSON.stringify(response)}`); 
+				this.setState(response);
+			}
+		);
 	}
 
 	handleCreate(event){
         event.preventDefault();
         
-		chrome.runtime.sendMessage({
-			kind: 'createCampaign'
-		}, response => {
-			console.log('CampaignSelection: create response');
-			this.setState({message: response.message});
-			chrome.extension.getBackgroundPage().console.log(`Create response : ${JSON.stringify(response)}`);
-			this.props.setParentState({campaignId: response.campaignId});
-		});
+		chrome.runtime.sendMessage(
+			{
+				kind: 'createCampaign'
+			}, response => {
+				console.log('CampaignSelection: create response');
+				this.setState(response);
+				chrome.extension.getBackgroundPage().console.log(`Create response : ${JSON.stringify(response)}`);
+			}
+		);
 	}
 
 	handleJoin(event) {
 		event.preventDefault();
 
 		let campaignId = document.getElementById('campaignId').value;
-		chrome.runtime.sendMessage({
-			kind: 'joinCampaign',
-			campaignId: campaignId
-		}, response => {
-			this.setState({message: response.message});
-			this.props.setParentState({campaignId: response.campaignId});
-		});
+		chrome.runtime.sendMessage(
+			{
+				kind: 'joinCampaign',
+				campaignId: campaignId
+			}, response => {
+				this.setState(response);
+			}
+		);
 	}
 
 	render() {
-		if (this.props.campaignId) {
+		if (this.state.mappedToCampaign) {
 			return <Redirect to="/record"/>;
 		} 
 		return (
 			<div>
-				<Button onClick={this.handleCreate}>Create new Campaign</Button>
-				<br/>
-				<Form horizontal onSubmit={this.handleJoin}>
-					<FormGroup>
-						<Col xs={2}><ControlLabel>CampaignId</ControlLabel></Col>
-						<Col xs={10}>
-							<FormControl id="campaignId" type="text" value={this.state.token}/>
+				
+				<Row className="show-grid">
+					<Alert bsStyle="info">{this.state.message}</Alert>
+				</Row>
+
+				<Row className="show-grid">
+					<Form horizontal onSubmit={this.handleJoin}>
+						<Col xs={6}>
+							<Button onClick={this.handleCreate}>Create new Campaign</Button>
 						</Col>
-					</FormGroup>
-					{this.state.message &&
+						<Col xs={6}>
+							<Button onClick={this.handleJoin}>Or Join existing Campaign</Button>
+						</Col>				
 						<FormGroup>
-							<Col xsOffset={2} xs={10}><Alert bsStyle="danger">{this.state.message}</Alert></Col>
+							<Col xs={2}>
+								<ControlLabel>CampaignId</ControlLabel>
+							</Col>
+							<Col xs={10}>
+								<FormControl id="campaignId" type="text"/>
+							</Col>
 						</FormGroup>
-					}
-					<FormGroup>
-						<Col xsOffset={2} xs={10}><Button id="joinButton" bsStyle="primary" type="submit">Or Join existing Campaign</Button></Col>
-					</FormGroup>
-				</Form>
+					</Form>
+				</Row>
 			</div>
 		);
 	}

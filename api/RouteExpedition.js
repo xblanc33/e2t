@@ -27,11 +27,12 @@ class RouteExpedition {
 
         this.rabbitChannel.sendToQueue('expeditionQueue'
             , Buffer.from(JSON.stringify(expedition))
+            , {}
             , (err,ok) => {
                 if (err)  {
-                    res.status(500).send(JSON.stringify(err));
+                    res.status(500).send(err.message);
                 } else {
-                    res.status(200).send(JSON.stringify(expedition));
+                    res.status(200).send(expedition);
                 }
             });
     }
@@ -40,10 +41,14 @@ class RouteExpedition {
         let expeditionCollection = this.mongoClient.db(this.dbName).collection(this.collectionName);
         expeditionCollection.findOne({_id: req.params.expeditionId})
         .then( expedition => {
-            res.status(200).send(JSON.stringify(expedition));
+            if (expedition) {
+                res.status(200).send(expedition);
+            } else {
+                res.status(204).send();
+            }
         })
         .catch( ex => {
-            res.status(204).send(JSON.stringify(ex));
+            res.status(500).send(ex.message);
         })
     }
 }

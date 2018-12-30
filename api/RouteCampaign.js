@@ -40,7 +40,7 @@ class RouteCampaign {
             });
         })
         .catch( ex => {
-            res.status(500).send(JSON.stringify(ex));
+            res.status(500).send(ex.message);
         });
     }
 
@@ -48,10 +48,14 @@ class RouteCampaign {
         let campaignCollection = this.mongoClient.db(this.dbName).collection(this.collectionName);
         campaignCollection.findOne({_id: req.params.campaignId})
         .then ( campaign => {
-            res.status(200).send(campaign);
+            if (campaign === undefined || campaign === null)  {
+                res.status(204).send();
+            } else {
+                res.status(200).send(campaign);
+            }
         })
         .catch( ex => {
-            res.status(204).send(JSON.stringify(ex));
+            res.status(500).send(ex.message);
         })
     }
 }

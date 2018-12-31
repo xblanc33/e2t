@@ -38,7 +38,7 @@ class Background {
                 return true;
 
             case 'createCampaign':      
-                Services.createCampaign()
+                Services.createCampaign(msg.options)
                     .then(response => {
                         if (response.status === 201) {
                             this.initialize();

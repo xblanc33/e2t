@@ -53,7 +53,7 @@ class Popup extends React.Component {
 					<Col xs={12} xsOffset={2}>
 						<PageHeader>E2T</PageHeader>
 						<p className="lead">Test Exploration</p>
-						<Button onClick={this.handleInitialization}>Init</Button>
+						<Button onClick={this.handleInitialization}>Change Campaign</Button>
 					</Col>
 				</Row>
 				{mainWindow}

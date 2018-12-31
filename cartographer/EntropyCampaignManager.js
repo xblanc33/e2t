@@ -1,9 +1,6 @@
 const winston = require('winston');
 const Ngram = require('./Ngram');
 
-const DEFAULT_DEPTH = 4;
-const DEFAULT_PROBA_OF_UNKNOWN = 0.01;
-
 const logger = winston.createLogger({
     level: 'info',
     transports: [new winston.transports.Console(),],
@@ -14,10 +11,11 @@ const logger = winston.createLogger({
 });
 
 class EntropyCampaignManager {
-    constructor(campaignId, ENTROPY_OPTION) {
-        this.campaignId = campaignId;
-        this.DEPTH = ENTROPY_OPTION.DEPTH || DEFAULT_DEPTH;
-        this.PROBA_OF_UNKNOWN = ENTROPY_OPTION.PROBA_OF_UNKNOWN || DEFAULT_PROBA_OF_UNKNOWN;
+    constructor(campaign) {
+        this.campaignId = campaign.campaignId;
+        this.DEPTH = campaign.depth;
+        this.PROBA_OF_UNKNOWN = campaign.probaOfUnknown;
+        logger.info(`Campaign manager with depth=${this.DEPTH} and proba=${this.PROBA_OF_UNKNOWN}`);
         this.ngramMap = new Map();
     }
 

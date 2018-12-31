@@ -1,6 +1,10 @@
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 
+const PropertiesReader = require('properties-reader');
+const properties = PropertiesReader('e2t.properties');
+
+
 class RouteCampaign {
 
     constructor(mongoClient, dbName, collectionName){
@@ -23,11 +27,19 @@ class RouteCampaign {
 
     createCampaign(req, res){
         let uuid = uuidv4();
+        let depth = properties.path().cartographer.depth;
+        let probaOfUnknown = properties.path().cartographer.proba_of_unknown;
+        if (req.body) {
+            if (req.body.depth) depth = req.body.depth;
+            if (req.body.probaOfUnknown) probaOfUnknow = req.body.probaOfUnknown;
+        }
         let campaign = {
             _id: uuid,
             campaignId : uuid,
             createdAt : new Date(),
             lastUpdate : new Date(),
+            depth : depth,
+            probaOfUnknown : probaOfUnknown,
             expedition : [],
             crossentropy : []
         };

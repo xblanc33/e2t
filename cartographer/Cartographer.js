@@ -2,6 +2,8 @@ const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const amqp = require('amqplib');
 const EntropyCampaignManager = require('./EntropyCampaignManager');
+const PropertiesReader = require('properties-reader');
+const properties = PropertiesReader('e2t.properties');
 
 const logger = winston.createLogger({
     level: 'info',
@@ -13,14 +15,13 @@ const logger = winston.createLogger({
 });
 
 class Cartographer {
-    constructor(URL, ENTROPY_OPTION) {
-        this.mongoUrl = `mongodb://${URL.MONGO}:27017`;
-        this.rmqUrl = `amqp://${URL.RABBIT}`;
+    constructor() {
+        this.mongoUrl = `mongodb://${properties.path().mongo.host}:${properties.path().mongo.port}`;
+        this.dbName = properties.path().mongo.database_name;
+
+        this.rmqUrl = `amqp://${properties.path().rabbit.host}`;
+        this.expeditionQueue = properties.path().rabbit.queue_name;
         
-        this.dbName = 'e2t';
-        this.expeditionQueue = 'expeditionQueue';
-        
-        this.ENTROPY_OPTION = ENTROPY_OPTION;
         this.entropyCampaignManagerMap = new Map();
     }
 
@@ -40,19 +41,25 @@ class Cartographer {
         }
     }
 
-    handleExpeditionCreation(msg){
+    async handleExpeditionCreation(msg){
         let expedition = JSON.parse(msg.content.toString());
-        logger.info(`Received new expedition with id ${expedition.uuid}`);
+        logger.info(`Received new expedition with id ${expedition.expeditionId}`);
         let collection = this.mongoClient.db(this.dbName).collection('expedition');
         expedition._id = expedition.expeditionId;
         collection.insertOne(expedition).catch(ex => {
-            winston.error(`can't save expedition : ${JSON.stringify(ex)}`);
+            winston.error(`can't save expedition : ${ex}`);
         });
 
         let manager = this.entropyCampaignManagerMap.get(expedition.campaignId);
         if (manager === undefined) {
-            manager = new EntropyCampaignManager(expedition.campaignId, this.ENTROPY_OPTION);
-            this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
+            try  {
+                manager = await this.createManager(expedition.campaignId);
+                this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
+            } catch (ex) {
+                this.channel.nack(msg);
+                winston.error(`can't find campaign : ${ex}`);
+                return;
+            }
         }
 
         let crossEntropy = manager.crossEntropy(expedition);
@@ -68,6 +75,22 @@ class Cartographer {
                 logger.error(`exception saving entropy ${JSON.stringify(ex)}`);
                 this.channel.nack(msg);
             })
+    }
+
+    createManager(campaignId) {
+        return this.mongoClient.db(this.dbName)
+            .collection('campaign')
+            .findOne({_id: campaignId})
+            .then ( campaign => {
+                if (campaign === undefined || campaign === null)  {
+                    return Promise.reject(new Error('campaign not found'));
+                } else {
+                    return campaign;
+                }
+            })
+            .then (campaign => {
+                return Promise.resolve(new EntropyCampaignManager(campaign));
+            });
     }
 
     addEntropy(campaignId, entropyValue){

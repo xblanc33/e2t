@@ -15,11 +15,14 @@ const logger = winston.createLogger({
     )
 });
 
-const PORT = 3000;
-const MONGO_URL = 'mongodb://mongo:27017';
-const DB_NAME = 'e2t';
-const RABBIT_URL = 'amqp://rabbit';
-const QUEUES_LIST = ['expeditionQueue'];
+const PropertiesReader = require('properties-reader');
+const properties = PropertiesReader('e2t.properties');
+
+const PORT = properties.path().app.port;
+const MONGO_URL = `mongodb://${properties.path().mongo.host}:${properties.path().mongo.port}`;
+const DB_NAME = properties.path().mongo.database_name;
+const RABBIT_URL = `amqp://${properties.path().rabbit.host}`;
+const QUEUES_LIST = [`${properties.path().rabbit.queue_name}`];
 
 (async() => {
     let mongoClient = await createConnectedMongoClient(MONGO_URL);

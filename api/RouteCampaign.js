@@ -23,21 +23,19 @@ class RouteCampaign {
 
     createCampaign(req, res){
         let uuid = uuidv4();
-        let collection = this.mongoClient.db(this.dbName).collection(this.collectionName);
-
-        collection.insertOne({
+        let campaign = {
             _id: uuid,
-            uuid : uuid,
+            campaignId : uuid,
             createdAt : new Date(),
             lastUpdate : new Date(),
             expedition : [],
             crossentropy : []
-        })
-        .then(document => {
-            res.status(201).send({
-                campaignId: uuid,
-                message: 'Successfully created new campaign'
-            });
+        };
+        let collection = this.mongoClient.db(this.dbName).collection(this.collectionName);
+
+        collection.insertOne(campaign)
+        .then(result => {
+            res.status(201).send(campaign);
         })
         .catch( ex => {
             res.status(500).send(ex.message);

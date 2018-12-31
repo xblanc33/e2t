@@ -23,7 +23,7 @@ class RouteExpedition {
 
     createExpedition(req, res){
         let expedition = req.body.expedition;
-        expedition.uuid = uuidv4();
+        expedition.expeditionId = uuidv4();
 
         this.rabbitChannel.sendToQueue('expeditionQueue'
             , Buffer.from(JSON.stringify(expedition))

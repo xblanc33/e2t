@@ -3,6 +3,13 @@ let NavigationListener = require('./NavigationListener');
 
 class Background {
     constructor() {
+        this.initialize();
+
+        this.handleMessage = this.handleMessage.bind(this);
+        this.navigationListener = new NavigationListener();
+    }
+
+    initialize() {
         this.state = {
             mappedToCampaign : false,
             isRecording : false,
@@ -11,11 +18,8 @@ class Background {
                 campaignId: undefined,
                 events: []
             },
-            message : `Plugin was just created`
+            message : `Plugin was just initialized`
         };
-
-        this.handleMessage = this.handleMessage.bind(this);
-        this.navigationListener = new NavigationListener();
     }
 
     start() {
@@ -24,6 +28,10 @@ class Background {
 
     handleMessage(msg, sender, sendResponse) {
         switch (msg.kind) {
+            case 'initialize':
+                this.initialize();
+                sendResponse(this.state);
+                return true;
 
             case 'getState':
                 sendResponse(this.state);
@@ -33,43 +41,22 @@ class Background {
                 Services.createCampaign()
                     .then(response => {
                         if (response.status === 201) {
-                            this.state = {
-                                mappedToCampaign : true,
-                                isRecording : false,
-                                campaignId : response.data.campaignId,
-                                expedition : {
-                                    campaignId: response.data.campaignId,
-                                    events: []
-                                },
-                                message : 'Campaign was created'
-                            };
+                            this.initialize();
+                            this.state.mappedToCampaign = true;
+                            this.state.campaignId = response.data.campaignId;
+                            this.state.expedition.campaignId = response.data.campaignId;
+                            this.state.message = 'Campaign was created'
                             sendResponse(this.state);
                         }
                         if (response.status === 501) {
-                            this.state = {
-                                mappedToCampaign : false,
-                                isRecording : false,
-                                campaignId : undefined,
-                                expedition : {
-                                    campaignId: undefined,
-                                    events: []
-                                },
-                                message : '501: Failed to create a campaign'
-                            };
+                            this.initialize();
+                            this.state.message = '501: Failed to create a campaign';
                             sendResponse(this.state);
                         }
                     })
                     .catch(e => {
-                        this.state = {
-                            mappedToCampaign : false,
-                            isRecording : false,
-                            campaignId : undefined,
-                            expedition : {
-                                campaignId: undefined,
-                                events: []
-                            },
-                            message : e.message
-                        };
+                        this.initialize();
+                        this.state.message = e.message;
                         sendResponse(this.state);
                     });
                 return true;
@@ -78,54 +65,25 @@ class Background {
                 Services.joinCampaign(msg.campaignId)
                     .then(response => {
                         if (response.status === 204) {
-                            this.state = {
-                                mappedToCampaign : false,
-                                isRecording : false,
-                                campaignId : undefined,
-                                expedition : {
-                                    campaignId: undefined,
-                                    events: []
-                                },
-                                message : 'No such campaign'
-                            };
+                            this.initialize();
+                            this.state.message = 'No such campaign';
                         };
                         if (response.status === 200) {
-                            this.state = {
-                                mappedToCampaign : true,
-                                isRecording : false,
-                                campaignId : response.data.campaignId,
-                                expedition : {
-                                    campaignId: response.data.campaignId,
-                                    events: []
-                                },
-                                message : 'Campaign linked'
-                            };
+                            this.initialize();
+                            this.state.mappedToCampaign = true;
+                            this.state.campaignId = response.data.campaignId;
+                            this.state.expedition.campaignId = response.data.campaignId;
+                            this.state.message = 'Campaign linked';
                         };
                         if (response.status === 500) {
-                            this.state = {
-                                mappedToCampaign : false,
-                                isRecording : false,
-                                campaignId : undefined,
-                                expedition : {
-                                    campaignId: undefined,
-                                    events: []
-                                },
-                                message : response.data
-                            };
+                            this.initialize();
+                            this.state.message = response.data;
                         };
                         sendResponse(this.state);
                     })
                     .catch(e => {
-                        this.state = {
-                            mappedToCampaign : false,
-                            isRecording : false,
-                            campaignId : undefined,
-                            expedition : {
-                                campaignId: undefined,
-                                events: []
-                            },
-                            message : e.message
-                        };
+                        this.initialize();
+                        this.state.message = e.message;
                         sendResponse(this.state);
                     });
                 return true;

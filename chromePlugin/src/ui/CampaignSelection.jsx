@@ -1,5 +1,4 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 import { Row, Form, Col, FormGroup, FormControl, ControlLabel, Button, Alert } from 'react-bootstrap';
 
 export default class CampaignSelection extends React.Component {
@@ -31,9 +30,10 @@ export default class CampaignSelection extends React.Component {
 			{
 				kind: 'createCampaign'
 			}, response => {
-				console.log('CampaignSelection: create response');
+				if (response.mappedToCampaign) {
+					this.props.syncParent();
+				}
 				this.setState(response);
-				chrome.extension.getBackgroundPage().console.log(`Create response : ${JSON.stringify(response)}`);
 			}
 		);
 	}
@@ -47,41 +47,28 @@ export default class CampaignSelection extends React.Component {
 				kind: 'joinCampaign',
 				campaignId: campaignId
 			}, response => {
+				if (response.mappedToCampaign) {
+					this.props.syncParent();
+				}
 				this.setState(response);
 			}
 		);
 	}
 
 	render() {
-		if (this.state.mappedToCampaign) {
-			return <Redirect to="/record"/>;
-		} 
 		return (
-			<div>
-				
-				<Row className="show-grid">
-					<Alert bsStyle="info">{this.state.message}</Alert>
-				</Row>
-
-				<Row className="show-grid">
-					<Form horizontal onSubmit={this.handleJoin}>
-						<Col xs={6}>
-							<Button onClick={this.handleCreate}>Create new Campaign</Button>
-						</Col>
-						<Col xs={6}>
-							<Button onClick={this.handleJoin}>Or Join existing Campaign</Button>
-						</Col>				
-						<FormGroup>
-							<Col xs={2}>
-								<ControlLabel>CampaignId</ControlLabel>
-							</Col>
-							<Col xs={10}>
-								<FormControl id="campaignId" type="text"/>
-							</Col>
-						</FormGroup>
-					</Form>
-				</Row>
-			</div>
+			<Form horizontal onSubmit={this.handleJoin} >
+				<Button onClick={this.handleCreate}>Create new Campaign</Button>
+				<Button onClick={this.handleJoin}>Or Join existing Campaign</Button>
+				<FormGroup>
+					<Col componentClass={ControlLabel} sm={2}>
+						CampaignId:
+					</Col>
+					<Col sm={10}>
+						<FormControl id="campaignId" type="text" placeholder="0228f330-8b64-4858-a325-7f3e23e900be"/>
+					</Col>
+				</FormGroup>
+			</Form>
 		);
 	}
 }

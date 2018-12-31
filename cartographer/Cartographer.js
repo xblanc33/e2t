@@ -44,7 +44,7 @@ class Cartographer {
         let expedition = JSON.parse(msg.content.toString());
         logger.info(`Received new expedition with id ${expedition.uuid}`);
         let collection = this.mongoClient.db(this.dbName).collection('expedition');
-        expedition._id = expedition.uuid;
+        expedition._id = expedition.expeditionId;
         collection.insertOne(expedition).catch(ex => {
             winston.error(`can't save expedition : ${JSON.stringify(ex)}`);
         });

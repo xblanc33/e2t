@@ -11,22 +11,22 @@ services:
     image: "rabbitmq:3"
   api:
     build: 
-      context: https://github.com/xblanc33/e2t.git
-      dockerfile: ./api/Dockerfile
+      context: api/
+      dockerfile: ./Dockerfile
     depends_on:
       - "rabbit"
       - "mongo"
   cartographer:
     build: 
-      context: https://github.com/xblanc33/e2t.git
-      dockerfile: ./cartographer/Dockerfile
+      context: cartographer/
+      dockerfile: ./Dockerfile
     depends_on:
       - "rabbit"
       - "mongo"
   front:
     build:
-      context: https://github.com/xblanc33/e2t.git
-      dockerfile: ./front/DockerfileProd
+      context: front/
+      dockerfile: ./DockerfileProd
     volumes:
       - /docker-volumes/etc/letsencrypt:/etc/letsencrypt
     depends_on:

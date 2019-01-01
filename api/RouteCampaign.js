@@ -29,14 +29,14 @@ class RouteCampaign {
         let uuid = uuidv4();
         let options = req.body.options;
 
-        let depth = properties.path().cartographer.depth;
+        let depth = Number.parseInt(properties.path().cartographer.depth);
         if (options.depth !== "" && Number.isInteger(options.depth)) {
             if (options.depth >=2 && options.depth <= 8 ) {
                 depth = Number.parseInt(options.depth);
             }
         }
         
-        let probaOfUnknown = properties.path().cartographer.proba_of_unknown;
+        let probaOfUnknown = Number.parseFloat(properties.path().cartographer.proba_of_unknown);
         if (options.proba !== "" && ! Number.isNaN(options.proba)) {
             if (options.proba < 1 && Number.isInteger(options.proba*100)) {
                 probaOfUnknown = Number.parseFloat(options.proba);

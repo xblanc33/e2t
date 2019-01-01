@@ -96,7 +96,15 @@ class Cartographer {
     addEntropy(campaignId, entropyValue){
         return this.mongoClient.db(this.dbName)
             .collection('campaign')
-            .updateOne({_id: campaignId}, {$push: {crossentropy: entropyValue}});
+            .updateOne(
+                {_id: campaignId}, 
+                {
+                    $push: {crossentropy: entropyValue},
+                    $currentDate: { 
+                        lastUpdate: true
+                    }
+                }
+            );
     }
 
 

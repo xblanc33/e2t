@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import {getCampaign} from './scenarioService.js';
@@ -56,7 +56,51 @@ export default class Campaign extends React.Component {
 		let welcomeMsg;
 		if (this.state.campaignId) {
 			if (this.state.campaign) {
-				welcomeMsg = (<div>Campaign:</div>);
+				welcomeMsg = (
+					<div>
+						<h1>Campaign</h1>
+						<Row>
+							<Col className='text-right' xs={3} md={2}>
+								Campaign Id:
+							</Col>
+							<Col className='text-left' xs={15} md={10}>
+								{this.state.campaign.campaignId}
+							</Col>
+						</Row>
+						<Row>
+							<Col className='text-right' xs={3} md={2}>
+								created at:
+							</Col>
+							<Col className='text-left' xs={15} md={10}>
+								{new Date(this.state.campaign.createdAt).toTimeString()}
+							</Col>
+						</Row>
+						<Row>
+							<Col className='text-right' xs={3} md={2}>
+								last Update:
+							</Col>
+							<Col className='text-left' xs={15} md={10}>
+								{new Date(this.state.campaign.lastUpdate).toTimeString()}
+							</Col>
+						</Row>
+						<Row>
+							<Col className='text-right' xs={3} md={2}>
+								depth:
+							</Col>
+							<Col className='text-left' xs={15} md={10}>
+								{this.state.campaign.depth}
+							</Col>
+						</Row>
+						<Row>
+							<Col className='text-right' xs={3} md={2}>
+								probability of unknown:
+							</Col>
+							<Col className='text-left' xs={15} md={10}>
+								{this.state.campaign.probaOfUnknown}
+							</Col>
+						</Row>
+					</div>
+				);
 			} else {
 				welcomeMsg = (<div>No campaign for this id</div>);
 			}
@@ -66,9 +110,7 @@ export default class Campaign extends React.Component {
 
 		return (
 			<div>
-				<Row>
-					{welcomeMsg}
-				</Row>
+				{welcomeMsg}
                 <Row>
 					<HighchartsReact
 						highcharts={Highcharts}

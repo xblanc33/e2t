@@ -1,5 +1,7 @@
 const winston = require('winston');
 const Ngram = require('./Ngram');
+const hashNGram = require('./hash').hashNGram;
+const hashItem = require('./hash').hashItem;
 
 const logger = winston.createLogger({
     level: 'info',
@@ -25,10 +27,21 @@ class EntropyCampaignManager {
         let probabilitySum = 0;
         for (let index = 0; index < expedition.events.length; index++) {
             let nextItem = expedition.events[index];
-            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.DEPTH);
+            let previousEventSeq = this.createPreviousEventSeq(expedition.events, index, this.DEPTH);
             probabilitySum = probabilitySum + Math.log2(this.computeProbability(previousEventSeq, nextItem));
         }
         return -(probabilitySum / expedition.events.length);
+    }
+
+    createPreviousEventSeq(eventSet, index, depth) {
+        let previousEventSeq = [];
+        if (index > 0) {
+            let previousFrom = Math.max(0,index - depth);
+            for (let previousIndex = previousFrom; previousIndex < index; previousIndex++) {
+                previousEventSeq.push(eventSet[previousIndex]);
+            }
+        }
+        return previousEventSeq;
     }
 
     computeProbability(previousEventSeq, nextItem) {
@@ -43,7 +56,7 @@ class EntropyCampaignManager {
         logger.info(`update model with expedition ${JSON.stringify(expedition.events)}`)
         for (let index = 0; index < expedition.events.length; index++) {
             let nextItem = expedition.events[index];
-            let previousEventSeq = createPreviousEventSeq(expedition.events, index, this.DEPTH);
+            let previousEventSeq = this.createPreviousEventSeq(expedition.events, index, this.DEPTH);
             this.updateProbability(previousEventSeq, nextItem);
         }
     }
@@ -62,35 +75,3 @@ class EntropyCampaignManager {
 }
 
 module.exports = EntropyCampaignManager;
-
-function hashItem(event) {
-    return hashCode(event.type+event.selector);
-}
-
-function hashNGram(eventSeq) {
-    return hashCode(eventSeq.map( event => {
-        return event.type+event.selector;
-    }).join(','));
-}
-
-function hashCode(s) {
-    let hash = 0, i, chr;
-    if (s.length === 0) return hash;
-    for (i = 0; i < s.length; i++) {
-        chr   = s.charCodeAt(i);
-        hash  = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-}
-
-function createPreviousEventSeq(eventSet, index, depth) {
-    let previousEventSeq = [];
-    if (index > 0) {
-        let previousFrom = Math.max(0,index - depth);
-        for (let previousIndex = previousFrom; previousIndex < index; previousIndex++) {
-            previousEventSeq.push(eventSet[previousIndex]);
-        }
-    }
-    return previousEventSeq;
-}

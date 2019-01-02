@@ -76,6 +76,79 @@ describe('EntropyCampaignManager', () => {
         assert.equal(proba, campaign.probaOfUnknown);
       });
   });
+  describe('#updateModel()', () => {
+      it('should add 5 Ngram to the map', () => {
+        let campaign = createCampaign();
+        let expedition = createExpedition();
+        expedition.one.campaignId = campaign.campaignId;
+        let manager = new EntropyCampaignManager(campaign);
+        manager.updateModel(expedition.one);
+        assert.equal(manager.ngramMap.size, 5);
+      });
+      it('should add 5 Ngram to the map', () => {
+        let campaign = createCampaign();
+        let expedition = createExpedition();
+        expedition.one.campaignId = campaign.campaignId;
+        expedition.two.campaignId = campaign.campaignId;
+        let manager = new EntropyCampaignManager(campaign);
+        manager.updateModel(expedition.one);
+        manager.updateModel(expedition.two);
+        assert.equal(manager.ngramMap.size, 5);
+      })
+  });
+  describe('#updateProbability()', () => {
+      it ('should update the probability of the last event', () => {
+        let campaign = createCampaign();
+        let expedition = createExpedition();
+        expedition.one.campaignId = campaign.campaignId;
+        let manager = new EntropyCampaignManager(campaign);
+        let previousSeq = expedition.one.events.slice(0,4);
+        let lastEvent = expedition.one.events[4];
+        let proba = manager.computeProbability(previousSeq, lastEvent);
+        assert.equal(proba, campaign.probaOfUnknown);
+        manager.updateModel(expedition.one);
+        proba = manager.computeProbability(previousSeq, lastEvent);
+        assert.equal(proba, 1 - campaign.probaOfUnknown);
+      });
+  });
+  describe('#crossEntropy()', () => {
+    it ('should compute crossEntropy with all right', () => {
+        let campaign = createCampaign();
+        let expedition = createExpedition();
+        expedition.one.campaignId = campaign.campaignId;
+        let manager = new EntropyCampaignManager(campaign);
+        manager.updateModel(expedition.one);
+        let crossEnt = manager.crossEntropy(expedition.one);
+        let right = 1 - campaign.probaOfUnknown;
+        let expected = - (5 * Math.log2(right)) / 5;
+        assert.equal(crossEnt, expected);
+    });
+    it ('should compute crossEntropy with one wrong', () => {
+        let campaign = createCampaign();
+        let expedition = createExpedition();
+        expedition.one.campaignId = campaign.campaignId;
+        let manager = new EntropyCampaignManager(campaign);
+        manager.updateModel(expedition.one);
+        expedition.two.campaignId = campaign.campaignId;
+        let crossEnt = manager.crossEntropy(expedition.two);
+        let right = 1 - campaign.probaOfUnknown;
+        let wrong = campaign.probaOfUnknown;
+        let expected = - (4 * Math.log2(right) + Math.log2(wrong)) / 5;
+        assert.equal(crossEnt, expected);
+    });
+    it ('should compute crossEntropy with all wrong', () => {
+        let campaign = createCampaign();
+        let expedition = createExpedition();
+        expedition.one.campaignId = campaign.campaignId;
+        let manager = new EntropyCampaignManager(campaign);
+        manager.updateModel(expedition.one);
+        expedition.three.campaignId = campaign.campaignId;
+        let crossEnt = manager.crossEntropy(expedition.three);
+        let wrong = campaign.probaOfUnknown;
+        let expected = - (10 * Math.log2(wrong)) / 10;
+        assert.equal(crossEnt, expected);
+    });
+  });
 });
 
 function createCampaign() {
@@ -107,16 +180,20 @@ function createExpedition() {
         type : 'click',
         selector : 'DIV > DIV > A'
     };
+    let f = {
+        type : 'hover',
+        selector : '#here'
+    }
     
     return {
         one : {
             events: [a,b,c,d,e]
         },
         two : {
-            events: [a,b,d,e,c]
+            events: [a,b,c,d,c]
         },
         three : {
-            events: [b,d,e,c,a]
+            events: [f,f,f,f,f,f,f,f,f,f]
         }
     }
 }

@@ -104,6 +104,7 @@ class Background {
                 return true;
 
             case 'publishExpedition':  // TODO Add url to the expedition object
+                this.state.expedition.result = msg.result;
                 Services.publishExpedition(this.state.expedition)
                     .then(response => {
                         this.state.isRecording = false;

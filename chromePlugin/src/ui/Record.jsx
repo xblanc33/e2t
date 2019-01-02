@@ -30,9 +30,12 @@ export default class Record extends React.Component {  // TODO
 	}
 
 	handlePublish(event) {
-		event.preventDefault();
+        event.preventDefault();
         chrome.runtime.sendMessage(
-            {kind: 'publishExpedition'},
+            {
+                kind: 'publishExpedition',
+                result: event.target.id
+            },
             response => this.setState(response)
         );
     }
@@ -48,8 +51,9 @@ export default class Record extends React.Component {  // TODO
 	render() {
         let buttonToolbar = this.state.isRecording?(  // True if the array is defined (even if empty)
             <ButtonToolbar>
-                <Button bsStyle="primary" onClick={this.handlePublish}>Publish</Button>
-                <Button bsStyle="danger" onClick={this.handleDelete}>Delete</Button>
+                <Button bsStyle="success" id="success" onClick={this.handlePublish}>Success</Button>
+                <Button bsStyle="danger" id="failure" onClick={this.handlePublish}>Failure</Button>
+                <Button bsStyle="primary" onClick={this.handleDelete}>Cancel</Button>
             </ButtonToolbar>
         ):(
             <ButtonToolbar>

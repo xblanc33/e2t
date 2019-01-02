@@ -42,21 +42,27 @@ class Popup extends React.Component {
 
 	render() {
 		let mainWindow;
+		let footer;
 		if (this.state.mappedToCampaign) {
 			mainWindow = (<Record/>);
+			footer = (
+				<Row>
+					<Col xsOffset={6} xs={2}>
+						<Button onClick={this.handleInitialization}>Change Campaign</Button>
+					</Col>
+				</Row>
+			);
 		} else {
 			mainWindow = (<CampaignSelection syncParent={this.syncWithBackground}/>); 
 		}
 		return (
 			<Grid fluid={true}>
 				<Row>
-					<Col xs={12} xsOffset={2}>
-						<PageHeader>E2T</PageHeader>
-						<p className="lead">Test Exploration</p>
-						<Button onClick={this.handleInitialization}>Change Campaign</Button>
-					</Col>
+					<PageHeader>E2T <small>Managin Test Exploration</small></PageHeader>
+					
 				</Row>
 				{mainWindow}
+				{footer}
 			</Grid>
 		);
 	}

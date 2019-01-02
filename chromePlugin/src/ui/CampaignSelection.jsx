@@ -67,6 +67,11 @@ export default class CampaignSelection extends React.Component {
 			<div>
 				<Form horizontal onSubmit={this.handleCreate} >
 					<FormGroup>
+						<Col xs={10}>
+							<Button type="submit">Create Campaign</Button>
+						</Col>
+					</FormGroup>
+					<FormGroup>
 						<Col componentClass={ControlLabel} xs={2}>
 							depth:
 						</Col>
@@ -76,32 +81,28 @@ export default class CampaignSelection extends React.Component {
 					</FormGroup>
 					<FormGroup>
 						<Col componentClass={ControlLabel} xs={2}>
-							proba of unknown:
+							proba:
 						</Col>
 						<Col xs={10}>
-							<FormControl id="proba" type="text" placeholder="0.05"/>
-						</Col>
-					</FormGroup>
-					<FormGroup>
-						<Col xsOffset={2} xs={10}>
-							<Button type="submit">Create Campaign</Button>
+							<FormControl id="proba" type="text" placeholder="0.01"/>
 						</Col>
 					</FormGroup>
 				</Form>
 				<Form horizontal onSubmit={this.handleJoin} >
 					<FormGroup>
+						<Col xs={10}>
+							<Button type="submit">Or Join existing Campaign</Button>
+						</Col>
+					</FormGroup>
+					<FormGroup>
 						<Col componentClass={ControlLabel} xs={2}>
-							CampaignId:
+							Id:
 						</Col>
 						<Col xs={10}>
 							<FormControl id="campaignId" type="text" placeholder="0228f330-8b64-4858-a325-7f3e23e900be"/>
 						</Col>
 					</FormGroup>
-					<FormGroup>
-						<Col xsOffset={2} xs={10}>
-							<Button type="submit">Or Join existing Campaign</Button>
-						</Col>
-					</FormGroup>
+					
 				</Form>
 			</div>
 		);

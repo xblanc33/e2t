@@ -11,6 +11,7 @@ const logger = winston.createLogger({
 
 class Ngram {
     constructor(hash) {
+        if (!hash) throw new Error('cannnot create a Ngram without a hash');
         this.hash = hash;
         this.successorMap = new Map();
         this.size = 0;

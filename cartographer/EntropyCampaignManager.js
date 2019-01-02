@@ -12,6 +12,7 @@ const logger = winston.createLogger({
 
 class EntropyCampaignManager {
     constructor(campaign) {
+        if (!campaign) throw new Error('EntropyCampaignManager should be created with a campaign');
         this.campaignId = campaign.campaignId;
         this.DEPTH = campaign.depth;
         this.PROBA_OF_UNKNOWN = campaign.probaOfUnknown;

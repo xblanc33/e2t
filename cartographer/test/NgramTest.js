@@ -16,6 +16,12 @@ describe('Ngram', function() {
         assert.equal(ngram.hash,1);
         assert.instanceOf(ngram.successorMap,Map);
     });
+    it('should create a Ngram with : a hash, 0 size and a successorMap', () => {
+        let ngram = new Ngram(0);
+        assert.equal(ngram.size,0);
+        assert.equal(ngram.hash,0);
+        assert.instanceOf(ngram.successorMap,Map);
+    });
   });
   describe('#updateSuccessorOccurence()', () => {
     it('should add one successor occurence', () => {

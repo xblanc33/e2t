@@ -3,14 +3,15 @@ E2T allows you to perform exploratory testing campaigns on your website.
 
 ## Getting started
 
-From one terminal:
+Launch the server:
 
 ```bash
 cd e2t
 docker-compose up --build
 ```
 
-From another terminal:
+Build the chrome plugin:
+
 ```bash
 cd e2t/chromePlugin
 npm run debug

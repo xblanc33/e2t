@@ -77,6 +77,16 @@ describe('EntropyCampaignManager', () => {
       });
   });
   describe('#updateModel()', () => {
+      it('should throw an exception', () => {
+          try {
+            let campaign = createCampaign();
+            let expedition = createExpedition();
+            let manager = new EntropyCampaignManager(campaign);
+            manager.updateModel(expedition.one);
+            assert.fail();
+          } catch (ex) {
+          }
+      });
       it('should add 5 Ngram to the map', () => {
         let campaign = createCampaign();
         let expedition = createExpedition();
@@ -113,18 +123,14 @@ describe('EntropyCampaignManager', () => {
   });
   describe('#crossEntropy()', () => {
     it ('should throw exception if expedition dos not target the same id', () => {
-        let campaign = createCampaign();
-        let expedition = createExpedition();
-        //expedition.one.campaignId = campaign.campaignId;
-        let manager = new EntropyCampaignManager(campaign);
-        manager.updateModel(expedition.one);
         try {
-            let crossEnt = manager.crossEntropy(expedition.one);
+            let campaign = createCampaign();
+            let expedition = createExpedition();
+            let manager = new EntropyCampaignManager(campaign);
+            manager.crossEntropy(expedition.one);
             assert.fail();
-            
         } catch(ex) {
-        }
-        
+        } 
     });
     it ('should compute crossEntropy with all right', () => {
         let campaign = createCampaign();

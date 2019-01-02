@@ -21,6 +21,11 @@ Then, follow the instructions [there](https://support.google.com/chrome_webstore
 
 ## An example workflow
 
-Open the Chrome Extension and create an account.  
-Then, create a campaign or join an existing one with the campaignId provided by your colleague.  
-You can now start an expedition with the Record button and see how your expedition link to those done by the other explorators.
+Open the Chrome Extension and create campaign.  
+Other testers can join an existing campaign by using the campaign id.
+
+Click the **Record** button to start and record an expedition. 
+
+Open a browser http://localhost/YOUR-CAMAPAIGN-ID and look if the performed expeditions are new (high level of entropy) or not so new.
+
+This may help you to better explore and then make better exploratory tests.

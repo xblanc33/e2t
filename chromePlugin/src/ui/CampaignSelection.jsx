@@ -84,7 +84,7 @@ export default class CampaignSelection extends React.Component {
 							proba:
 						</Col>
 						<Col xs={10}>
-							<FormControl id="proba" type="text" placeholder="0.01"/>
+							<FormControl id="proba" type="text" placeholder="0.001"/>
 						</Col>
 					</FormGroup>
 				</Form>

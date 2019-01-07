@@ -24,6 +24,7 @@ class EntropyCampaignManager {
 
     crossEntropy(expedition) {
         if (expedition.campaignId !== this.campaignId) throw "EntropyCampaignManager received wrong expedition";
+        if (expedition.events.length === 0) return this.PROBA_OF_UNKNOWN;
         let probabilitySum = 0;
         for (let index = 0; index < expedition.events.length; index++) {
             let nextItem = expedition.events[index];

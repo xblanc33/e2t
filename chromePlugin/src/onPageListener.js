@@ -1,16 +1,16 @@
 import { select } from './optimal-select.js';
 
-(async () => {
+(() => {
 
     let listeners = [
         'click',
-        //'mousedown',
-        //'mouseup',
+        'mousedown',
+        'mouseup',
         'focus',
         'blur',
         'keydown',
         'change',
-        //'dblclick',
+        'dblclick',
         //'mousemove',
         //'mouseover',
         //'mouseout',
@@ -36,8 +36,6 @@ import { select } from './optimal-select.js';
         'submit'
     ];
     listeners.forEach(listener => document.body.addEventListener(listener, handleAllEvents, true));
-
-
 })();
 
 function handleAllEvents(e){

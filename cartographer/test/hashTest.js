@@ -2,10 +2,27 @@ const assert = require('chai').assert;
 
 const hashItem = require('../hash.js').hashItem;
 const hashNGram = require('../hash.js').hashNGram;
+const hashCode = require('../hash.js').hashCode;
 
 
 describe('hash', function() {
   describe('#hashItem()', function() {
+    it('should throw an exception with undefined item', () => {
+        try  {
+            hashItem(undefined);
+            assert.fail();
+        } catch (ex) {
+
+        }
+    });
+    it('should throw an exception with null item', () => {
+        try  {
+            hashItem(null);
+            assert.fail();
+        } catch (ex) {
+
+        }
+    });
     it('should hash empty', () => {
         let hash = hashItem({type:'',selector:''});
         assert.equal(hash,0);
@@ -24,6 +41,30 @@ describe('hash', function() {
     });
   });
   describe('#hashNgram()', function() {
+    it('should throw an exception with undefined hashNgram', () => {
+        try  {
+            hashNgram(undefined);
+            assert.fail();
+        } catch (ex) {
+
+        }
+    });
+    it('should throw an exception with null hashNgram', () => {
+        try  {
+            hashNgram(null);
+            assert.fail();
+        } catch (ex) {
+
+        }
+    });
+    it('should throw an exception with empty hashNgram', () => {
+        try  {
+            hashNgram([]);
+            assert.fail();
+        } catch (ex) {
+
+        }
+    });
     it('should create different hash', () => {
         let itemSeq = createExpedition();
         assert.isArray(itemSeq);
@@ -36,6 +77,24 @@ describe('hash', function() {
         let hash0 = hashNGram(itemSeq);
         let hash1 = hashNGram(itemSeq);
         assert.deepEqual(hash0,hash1);
+    });
+  });
+  describe('#hashCode()', function() {
+    it('should throw an exception with undefined', () => {
+        try  {
+            hashCode(undefined);
+            assert.fail();
+        } catch (ex) {
+
+        }
+    });
+    it('should throw an exception with null', () => {
+        try  {
+            hashCode(null);
+            assert.fail();
+        } catch (ex) {
+
+        }
     });
   });
 });

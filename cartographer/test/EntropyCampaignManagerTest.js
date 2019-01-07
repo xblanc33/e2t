@@ -134,6 +134,16 @@ describe('EntropyCampaignManager', () => {
     });
     it ('should compute crossEntropy with all right', () => {
         let campaign = createCampaign();
+        let empty = {
+            events : [],
+            campaignId : campaign.campaignId
+        };
+        let manager = new EntropyCampaignManager(campaign);
+        let crossEnt = manager.crossEntropy(empty);
+        assert.equal(crossEnt, manager.PROBA_OF_UNKNOWN);
+    });
+    it ('should compute crossEntropy with all right', () => {
+        let campaign = createCampaign();
         let expedition = createExpedition();
         expedition.one.campaignId = campaign.campaignId;
         let manager = new EntropyCampaignManager(campaign);

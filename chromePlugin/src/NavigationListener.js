@@ -5,43 +5,47 @@ class NavigationListener {
         this.window = null;
         this.tab = null;
 
-        this.webNavigationCommitted = this.webNavigationCommitted.bind(this);
+        //this.webNavigationCommitted = this.webNavigationCommitted.bind(this);
         this.webNavigationCompleted = this.webNavigationCompleted.bind(this);
 
-        chrome.webNavigation.onCommitted.addListener(this.webNavigationCommitted);
+        //chrome.webNavigation.onCommitted.addListener(this.webNavigationCommitted);
         chrome.webNavigation.onCompleted.addListener(this.webNavigationCompleted);
-        this.addBrowserListeners();
+        //this.addBrowserListeners();
     }
 
     calibrate(){
-        chrome.windows.getCurrent({populate:true}, window => {
-            this.window = window;
-            this.tab = window.tabs.find( tab => {return tab.active;});
-            chrome.tabs.reload(this.tab.id);
+        let promise = new Promise( (res, rej) => {
+            chrome.windows.getCurrent({populate:true}, window => {
+                if (window === null || window === undefined) rej();
+                this.window = window;
+                this.tab = window.tabs.find( tab => {return tab.active;});
+                chrome.tabs.reload(this.tab.id, {bypassCache: true}, () => {
+                    res();
+                });
+            });
         });
-    }
-
-    webNavigationCommitted({transitionType, url}) {
-        chrome.runtime.sendMessage({
-            kind:'addEventToExpedition',
-            event: {
-                type: 'GotoAction',
-                url:url,
-                transitionType: transitionType
-            }
-        });
+        return promise;
     }
     
     webNavigationCompleted({tabId, frameId}) {
         if (this.tab && (this.tab.id === tabId  ))  {
             if (frameId === 0) {
-                chrome.tabs.executeScript(this.tab.id, {file:'onPageListener.js'},
-                    result => chrome.extension.getBackgroundPage().console.log(result == undefined?'Failed loading attachListener':'Success loading onPageListener'));
+                chrome.tabs.executeScript(
+                    this.tab.id,
+                    {file: 'listener.js'},
+                    result => {
+                        if (result === undefined) {
+                            chrome.extension.getBackgroundPage().console.log('cannot load listener.js');
+                        } else {
+                            chrome.extension.getBackgroundPage().console.log(`listener.js:${this.tab.id}`);
+                        }
+                    }
+                );
             }
-        }
+        }        
     }
     
-    addBrowserListeners(){
+    /*addBrowserListeners(){
         //Monitor tab creation
         chrome.tabs.onCreated.addListener(tab => {
             chrome.runtime.sendMessage({kind:'addEventToExpedition', action: {type:'TabCreatedAction', url: tab.url, title: tab.title} });
@@ -51,7 +55,7 @@ class NavigationListener {
         chrome.tabs.onCreated.addListener(tab => {
             chrome.runtime.sendMessage({kind:'addEventToExpedition', action: {type:'TabRemovedAction', url: tab.url, title: tab.title} });
         });
-    }
+    }*/
 }
 
 module.exports = NavigationListener;

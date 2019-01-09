@@ -1,6 +1,6 @@
 function hashItem(event) {
     if (event === undefined || event === null) throw 'cannot hash undefined / null item';
-    return hash = hashCode(event.type+event.selector);
+    return hash = hashCode(event.type+event.selector+event.value);
 }
 
 function hashNGram(eventSeq) {

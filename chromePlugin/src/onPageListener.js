@@ -26,11 +26,13 @@ function attach() {
     const selects = document.querySelectorAll('select');
 	selects.forEach(
         select => {
-            select[i].addEventListener('change', handleChange, true); 
+            select.addEventListener('change', handleChange, true); 
         }
     );
 
-	document.body.addEventListener('click', handleClick, true);
+    document.body.addEventListener('click', handleClick, true);
+    
+    document.body.addEventListener('submit', handleSubmit, true);
 }
 
 
@@ -77,6 +79,15 @@ function handleClick (e) {
         const type = e.type;
         const selector = computeSelector(e.target);
         const value = 'click';
+        handleAllEvents(type, selector, value);
+    }
+}
+
+function handleSubmit (e) {
+    if (e.type === 'submit') {
+        const type = e.type;
+        const selector = computeSelector(e.target);
+        const value = 'submit';
         handleAllEvents(type, selector, value);
     }
 }

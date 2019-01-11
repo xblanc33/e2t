@@ -21,13 +21,21 @@ class Popup extends React.Component {
 	}
 
 	syncWithBackground() {
-		chrome.runtime.sendMessage(
-			{kind:'getState'}, 
-			response => {
-				chrome.extension.getBackgroundPage().console.log(`Got state : ${JSON.stringify(response)}`); 
-				this.setState(response);
-			}
-		);
+		chrome.windows.getCurrent({populate:true}, window => {
+			chrome.runtime.sendMessage(
+				{kind:'setWindow' , windowId : window.id},
+				() => {
+					chrome.runtime.sendMessage(
+						{kind:'getState'}, 
+						response => {
+							chrome.extension.getBackgroundPage().console.log(`Got state : ${JSON.stringify(response)}`); 
+							this.setState(response);
+						}
+					);
+				}
+			)
+		});
+		
 	}
 
 	handleInitialization() {

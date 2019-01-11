@@ -12,6 +12,7 @@ class Background {
     initialize() {
         this.state = {
             mappedToCampaign : false,
+            windowId : undefined,
             isRecording : false,
             campaignId : undefined,
             expedition : {
@@ -31,6 +32,11 @@ class Background {
             case 'initialize':
                 this.initialize();
                 sendResponse(this.state);
+                return true;
+
+            case 'setWindow':
+                this.state.windowId = msg.windowId;
+                sendResponse(this.windowId);
                 return true;
 
             case 'getState':
@@ -91,7 +97,7 @@ class Background {
             case 'startExpedition':
                 this.state.isRecording = true;
                 this.state.expedition.events = [];
-                this.navigationListener.calibrate();
+                this.navigationListener.startExpedition(this.state);
                 sendResponse(this.state);
                 return true;
 

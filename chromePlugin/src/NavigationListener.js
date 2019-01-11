@@ -13,9 +13,9 @@ class NavigationListener {
         //this.addBrowserListeners();
     }
 
-    calibrate(){
+    startExpedition(state){
         let promise = new Promise( (res, rej) => {
-            chrome.windows.getCurrent({populate:true}, window => {
+            chrome.windows.get(state.windowId, {populate:true}, window => {
                 if (window === null || window === undefined) rej();
                 this.window = window;
                 this.tab = window.tabs.find( tab => {return tab.active;});

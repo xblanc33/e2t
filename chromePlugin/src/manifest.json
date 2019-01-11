@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "E2T | Exploratory Testing Tool",
-  "version": "0.1",
+  "version": "0.2",
   "description": "Use javascript events for Exploratory Testing quality measurement.",
   "permissions": [
     "webNavigation",

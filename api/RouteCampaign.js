@@ -30,16 +30,18 @@ class RouteCampaign {
         let options = req.body.options;
 
         let depth = Number.parseInt(properties.path().cartographer.depth);
-        if (options.depth !== "" && Number.isInteger(options.depth)) {
-            if (options.depth >=2 && options.depth <= 8 ) {
-                depth = Number.parseInt(options.depth);
+        let optionDepth = Number.parseInt(options.depth);
+        if (!isNaN(optionDepth)) {
+            if (optionDepth >=2 && optionDepth <= 8 ) {
+                depth = optionDepth;
             }
         }
         
         let probaOfUnknown = Number.parseFloat(properties.path().cartographer.proba_of_unknown);
-        if (options.proba !== "" && ! Number.isNaN(options.proba)) {
-            if (options.proba < 1 && Number.isInteger(options.proba*100)) {
-                probaOfUnknown = Number.parseFloat(options.proba);
+        let optionsProba = Number.parseFloat(options.proba);
+        if (!isNaN(optionsProba)) {
+            if (optionsProba < 1 && Number.isInteger(optionsProba*100)) {
+                probaOfUnknown = optionsProba;
             }
         }
 

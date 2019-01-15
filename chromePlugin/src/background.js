@@ -15,6 +15,9 @@ class Background {
             windowId : undefined,
             isRecording : false,
             campaignId : undefined,
+            autoPublish : false,
+            autoPublishTime : 4000,
+            autoPublishInterval : undefined,
             expedition : {
                 campaignId: undefined,
                 events: []
@@ -37,6 +40,37 @@ class Background {
             case 'setWindow':
                 this.state.windowId = msg.windowId;
                 sendResponse(this.windowId);
+                return true;
+
+            case 'launchAutoRecord':
+                console.log(`launchAutoRecord:${msg.autoPublish}`);
+                this.state.autoPublish = msg.autoPublish;
+                this.state.autoPublishTime = msg.autoPublishTime;
+                if (!this.state.autoPublish) {
+                    console.log('clear');
+                    if (this.state.autoPublishInterval) {
+                        clearInterval(this.state.autoPublishInterval);
+                    }
+                } else {
+                    console.log('start');
+                    this.state.isRecording = true;
+                    this.state.expedition.events = [];
+                    this.navigationListener.startExpedition(this.state);
+                    this.state.autoPublishInterval = setInterval(()=>{
+                        if (this.state.expedition.events.length >0) {
+                            Services.publishExpedition(this.state.expedition)
+                                .then(response => {
+                                    console.log('publishExpe');
+                                    this.state.isRecording = false;
+                                    this.state.expedition.events = [];
+                                })
+                                .catch(e => {
+                                    this.state.message = e.message;
+                                });
+                        }
+                    }, this.state.autoPublishTime);
+                }
+                sendResponse(this.state);
                 return true;
 
             case 'getState':

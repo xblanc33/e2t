@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Form, Col, FormGroup, FormControl, ControlLabel, Button, Alert } from 'react-bootstrap';
+import { Form, Col, FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
 
 export default class CampaignSelection extends React.Component {
 

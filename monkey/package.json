@@ -1,0 +1,15 @@
+{
+  "name": "monkey",
+  "version": "1.0.0",
+  "description": "monkey tester",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "puppeteer": "^1.11.0"
+  }
+}

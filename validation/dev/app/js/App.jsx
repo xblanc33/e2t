@@ -29,7 +29,7 @@ class App extends React.Component {
 		let numbers = Array.apply(null, {length: this.state.value}).map(Number.call, Number)
 		let uls = (
 			<ul>
-				{numbers.map((number) => <li><a href="http://localhost">{number}</a></li>)}
+				{numbers.map((number) => <li><a href="#">{number}</a></li>)}
 			</ul>
 		);
 		return (

@@ -1,7 +1,7 @@
 {
   "name": "front",
   "version": "1.0.0",
-  "description": "WAT FRONT",
+  "description": "E2T FRONT",
   "main": "ops/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

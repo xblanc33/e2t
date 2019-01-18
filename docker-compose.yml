@@ -39,4 +39,10 @@ services:
       - "api"
     ports:
       - 80:80
+  validation:
+    build:
+      context: validation/
+      dockerfile: ./Dockerfile
+    ports:
+      - 8080:8080
 

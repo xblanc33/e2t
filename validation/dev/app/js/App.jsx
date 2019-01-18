@@ -8,28 +8,33 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			value : 10
+			value : 10,
+			clicked : 'Not Yet'
 		}
 		this.handleChange = this.handleChange.bind(this);
+		this.handleClick = this.handleClick.bind(this);
 	}
 
 	handleChange(event) {
-		console.log(event.target.value);
 		event.preventDefault();
 		let lis = parseInt(event.target.value);
-		console.log(lis);
 		if (!isNaN(lis)) {
 			console.log("setState");
 			this.setState({value:event.target.value});
 		}
 	}
 
+	handleClick(event) {
+		event.preventDefault();
+		let clicked = event.target.innerHTML;
+		this.setState({clicked:clicked});
+	}
+
 	render() {
-		console.log(`${this.state.value}`);
 		let numbers = Array.apply(null, {length: this.state.value}).map(Number.call, Number)
 		let uls = (
 			<ul>
-				{numbers.map((number) => <li><a href="#">{number}</a></li>)}
+				{numbers.map((number) => <li><a href="#" onClick={this.handleClick}>{number}</a></li>)}
 			</ul>
 		);
 		return (
@@ -49,6 +54,10 @@ class App extends React.Component {
 				</Row>
 				<Row>
 					{uls}
+				</Row>
+				<Row>
+					<h1>Last Click</h1>
+					<h2>{this.state.clicked}</h2>
 				</Row>
 			</Grid>
 		);

@@ -40,7 +40,7 @@ class RouteCampaign {
         let probaOfUnknown = Number.parseFloat(properties.path().cartographer.proba_of_unknown);
         let optionsProba = Number.parseFloat(options.proba);
         if (!isNaN(optionsProba)) {
-            if (optionsProba < 1 && Number.isInteger(optionsProba*100)) {
+            if (optionsProba < 1) {
                 probaOfUnknown = optionsProba;
             }
         }

@@ -2,7 +2,14 @@ const puppeteer = require('puppeteer');
 let axios = require('axios');
 const BASE_URL = 'http://localhost:3000';
 const URL = 'http://localhost:8080';
-const SLOW_MOTION = 400;
+
+const CLOSE_PAGE_AFTER = 1000; 
+const HEADLESS = false;
+const SLOW_MOTION = 100;
+const DEPTH = 4;
+const PROBA = 0.000001; //Gives entropy of 19 
+//const PROBA = 0.001; //Gives entropy of 10 
+
 
 class Monkey {
     constructor(explorationLength) {
@@ -10,7 +17,7 @@ class Monkey {
     }
 
     async init() {
-        this.browser = await puppeteer.launch({sloMo : SLOW_MOTION});
+        this.browser = await puppeteer.launch({slowMo : SLOW_MOTION, headless : HEADLESS});
         this.page = await this.browser.newPage();
     }
 
@@ -18,14 +25,18 @@ class Monkey {
         await this.createCampaign();
         await this.fetch();
         while (true) {
-            await this.explore();
+            for (let index = 0; index < CLOSE_PAGE_AFTER; index++) {
+                await this.explore();
+            }
+            this.page.close();
+            this.page = await this.browser.newPage();
         }
     }
 
     async createCampaign() {
         let response = await axios.post(`${BASE_URL}/api/campaign`, {options: {
-            depth: 2,
-            proba: 0.001
+            depth: DEPTH,
+            proba: PROBA
         }});
         if (response.status === 201) {
             this.campaignId = response.data.campaignId;

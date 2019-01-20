@@ -1,10 +1,13 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
 import {getCampaign} from './scenarioService.js';
+import * as am4core from "@amcharts/amcharts4/core";
+import * as am4charts from "@amcharts/amcharts4/charts";
+import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
-const REFRESH_TEMPO = 10000;
+am4core.useTheme(am4themes_animated);
+
+const REFRESH_TEMPO = 3000;
 
 export default class Campaign extends React.Component {
 
@@ -23,15 +26,21 @@ export default class Campaign extends React.Component {
 		if (this.state.campaignId) {
 			getCampaign(this.state.campaignId)
 				.then(campaign => {
-					//console.log('fetched');
-					this.setState({
-						campaign: campaign,
-						entropyList: campaign.crossentropy,
-						loaded: true
-					});
+					let start = this.chart.data.length;
+
+					for (let index = start; index < campaign.crossentropy.length; index++) {
+						this.chart.addData({entropy:campaign.crossentropy[index].entropy,
+							date: new Date(campaign.crossentropy[index].date)});
+					}
+					if (!this.state.loaded) {
+						this.setState({
+							campaign: campaign,
+							loaded: true
+						});
+					}
+					
 				})
 				.catch((err) => {
-					//console.log(`error:${err}`);
 					this.setState({
 						campaign: undefined,
 						error: err,
@@ -42,14 +51,53 @@ export default class Campaign extends React.Component {
 	}
 
 	componentWillMount() {
-		let interval = setInterval(() => this.updateCampaign(), REFRESH_TEMPO);
-
-		this.setState({
-			intervalId: interval
-		});
-
-		this.updateCampaign();
 	}
+
+	componentDidMount() {
+		let interval = setInterval(() => this.updateCampaign(), REFRESH_TEMPO);
+		this.interval = interval;
+
+		let chart = am4core.create("chartdiv", am4charts.XYChart);
+		chart.data = [];
+		let dateXAxis = chart.xAxes.push(new am4charts.DateAxis());
+		dateXAxis.renderer.grid.template.location = 0;
+		dateXAxis.renderer.minGridDistance = 30;
+		dateXAxis.dateFormats.setKey("second", "ss");
+		dateXAxis.periodChangeDateFormats.setKey("second", "[bold]h:mm a");
+		dateXAxis.periodChangeDateFormats.setKey("minute", "[bold]h:mm a");
+		dateXAxis.periodChangeDateFormats.setKey("hour", "[bold]h:mm a");
+		dateXAxis.renderer.inside = true;
+		dateXAxis.renderer.axisFills.template.disabled = true;
+		dateXAxis.renderer.ticks.template.disabled = true;
+		dateXAxis.title.text ="date";
+		dateXAxis.interpolationDuration = 500;
+		dateXAxis.rangeChangeDuration = 500;
+
+		let valueYAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		valueYAxis.strictMinMax = true;
+		valueYAxis.min = 0;
+		valueYAxis.max = 20;
+		valueYAxis.title.text ="entropy";
+
+		chart.scrollbarX = new am4core.Scrollbar();
+
+		let series = chart.series.push(new am4charts.LineSeries());
+		series.dataFields.dateX = "date";
+		series.dataFields.valueY = "entropy";
+		series.interpolationDuration = 500;
+		series.defaultState.transitionDuration = 0;
+		series.tensionX = 0.8;
+		this.chart = chart;
+	}
+
+	componentWillUnmount() {
+		if (this.chart) {
+		  this.chart.dispose();
+		}
+		if (this.interval) {
+			clearInterval(this.interval);
+		}
+	  }
 
 	
 	render() {
@@ -112,33 +160,7 @@ export default class Campaign extends React.Component {
 			<div>
 				{welcomeMsg}
                 <Row>
-					<HighchartsReact
-						highcharts={Highcharts}
-						options={{
-							chart: {
-								type: 'spline',
-								animation: Highcharts.svg,
-								height: 200
-							},
-							legend: {
-								enabled: false
-							},
-							credits: false,
-							title: null,
-							xAxis: {
-								type: 'datetime',
-								labels: {
-									enabled: false
-								}
-							},
-							yAxis: {
-								title: null
-							},
-							series: [{
-								data: this.state.entropyList
-							}]
-						}}
-					/>
+					<div id="chartdiv" style={{ width: "100%", height: "500px" }}></div>
                 </Row>
 			</div>
 		);

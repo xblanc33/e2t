@@ -99,7 +99,7 @@ class Cartographer {
             .updateOne(
                 {_id: campaignId}, 
                 {
-                    $push: {crossentropy: entropyValue},
+                    $push: {crossentropy: {date:new Date(), entropy: entropyValue}},
                     $currentDate: { 
                         lastUpdate: true
                     }

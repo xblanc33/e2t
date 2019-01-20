@@ -6,7 +6,7 @@ const URL = 'http://localhost:8080';
 const CLOSE_PAGE_AFTER = 1000; 
 const HEADLESS = false;
 const SLOW_MOTION = 100;
-const DEPTH = 4;
+const DEPTH = 3;
 const PROBA = 0.000001; //Gives entropy of 19 
 //const PROBA = 0.001; //Gives entropy of 10 
 
@@ -18,6 +18,7 @@ class Monkey {
 
     async init() {
         this.browser = await puppeteer.launch({slowMo : SLOW_MOTION, headless : HEADLESS});
+        //this.browser = await puppeteer.launch();
         this.page = await this.browser.newPage();
     }
 

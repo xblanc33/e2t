@@ -29,8 +29,12 @@ export default class Campaign extends React.Component {
 					let start = this.chart.data.length;
 
 					for (let index = start; index < campaign.crossentropy.length; index++) {
-						this.chart.addData({entropy:campaign.crossentropy[index].entropy,
-							date: new Date(campaign.crossentropy[index].date)});
+						let entropy = {
+							value:campaign.crossentropy[index].value,
+							date: new Date(campaign.crossentropy[index].date)
+						};
+						console.log(`${JSON.stringify(entropy)}`);
+						this.chart.addData(entropy);
 					}
 					if (!this.state.loaded) {
 						this.setState({
@@ -77,16 +81,35 @@ export default class Campaign extends React.Component {
 		valueYAxis.strictMinMax = true;
 		valueYAxis.min = 0;
 		valueYAxis.max = 20;
-		valueYAxis.title.text ="entropy";
+		valueYAxis.title.text ="cross entropy";
 
 		chart.scrollbarX = new am4core.Scrollbar();
 
 		let series = chart.series.push(new am4charts.LineSeries());
 		series.dataFields.dateX = "date";
-		series.dataFields.valueY = "entropy";
+		series.dataFields.valueY = "value";
 		series.interpolationDuration = 500;
 		series.defaultState.transitionDuration = 0;
 		series.tensionX = 0.8;
+		series.tooltipText = "{value}";
+		series.minBulletDistance = 15;
+
+		let bullet = series.bullets.push(new am4charts.Bullet());
+		/*bullet.events.on("hit", (ev) => {
+			console.log(ev.target);
+			console.log(`${JSON.stringify(ev.target.dataIem)}`);
+			console.log(`${JSON.stringify(ev.target.dataIem.dataContext)}`);
+			//ev.target.dataItem.dataContext.name
+
+		});*/
+		let square = bullet.createChild(am4core.Rectangle);
+		square.width = 10;
+		square.height = 10;
+		square.horizontalCenter = "middle";
+		square.verticalCenter = "middle";
+		square.stroke = am4core.color("#2F4858");
+		square.strokeWidth = 1;
+
 		this.chart = chart;
 	}
 

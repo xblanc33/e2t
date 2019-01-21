@@ -65,8 +65,9 @@ class Cartographer {
         let crossEntropy = manager.crossEntropy(expedition);
         logger.info(`CrossEntropy ${crossEntropy}`);
         manager.updateModel(expedition);
+        let entr = {value: crossEntropy, date: new Date(), expeditionId: expedition.expeditionId};
 
-        this.addEntropy(expedition.campaignId, crossEntropy)
+        this.addEntropy(expedition.campaignId, entr)
             .then( () => {
                 logger.info(`Save cross entropy`);
                 this.channel.ack(msg);
@@ -93,13 +94,13 @@ class Cartographer {
             });
     }
 
-    addEntropy(campaignId, entropyValue){
+    addEntropy(campaignId, entropy){
         return this.mongoClient.db(this.dbName)
             .collection('campaign')
             .updateOne(
                 {_id: campaignId}, 
                 {
-                    $push: {crossentropy: {date:new Date(), entropy: entropyValue}},
+                    $push: {crossentropy: entropy},
                     $currentDate: { 
                         lastUpdate: true
                     }

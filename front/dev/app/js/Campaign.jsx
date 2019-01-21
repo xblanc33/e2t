@@ -95,13 +95,10 @@ export default class Campaign extends React.Component {
 		series.minBulletDistance = 15;
 
 		let bullet = series.bullets.push(new am4charts.Bullet());
-		/*bullet.events.on("hit", (ev) => {
+		bullet.events.on("hit", (ev) => {
 			console.log(ev.target);
-			console.log(`${JSON.stringify(ev.target.dataIem)}`);
-			console.log(`${JSON.stringify(ev.target.dataIem.dataContext)}`);
-			//ev.target.dataItem.dataContext.name
-
-		});*/
+			console.log(`value : ${ev.target.dataItem.dataContext.value}`);
+		});
 		let square = bullet.createChild(am4core.Rectangle);
 		square.width = 10;
 		square.height = 10;

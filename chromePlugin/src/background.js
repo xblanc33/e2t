@@ -64,6 +64,8 @@ class Background {
                     console.log('start');
                     this.state.isRecording = true;
                     this.state.expedition.events = [];
+                    this.state.expedition.userId = this.state.userId;
+                    this.state.expedition.userColor = this.state.userColor;
                     this.navigationListener.startExpedition(this.state);
                     this.state.autoPublishInterval = setInterval(() => {
                         if (this.state.expedition.events.length > 0) {

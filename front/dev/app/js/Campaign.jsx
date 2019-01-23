@@ -33,7 +33,7 @@ export default class Campaign extends React.Component {
 							value:campaign.crossentropy[index].value,
 							date: new Date(campaign.crossentropy[index].date)
 						};
-						console.log(`${JSON.stringify(entropy)}`);
+						//console.log(`${JSON.stringify(entropy)}`);
 						this.chart.addData(entropy);
 					}
 					if (!this.state.loaded) {

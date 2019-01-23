@@ -17,8 +17,8 @@ class Monkey {
     }
 
     async init() {
-        this.browser = await puppeteer.launch({slowMo : SLOW_MOTION, headless : HEADLESS});
-        //this.browser = await puppeteer.launch();
+        //this.browser = await puppeteer.launch({slowMo : SLOW_MOTION, headless : HEADLESS});
+        this.browser = await puppeteer.launch();
         this.page = await this.browser.newPage();
     }
 

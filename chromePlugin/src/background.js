@@ -162,6 +162,8 @@ class Background {
 
             case 'publishExpedition':  // TODO Add url to the expedition object
                 this.state.expedition.result = msg.result;
+                this.state.expedition.userId = this.state.userId;  //TODO This could be easily changed by the client... but does security really matter here ?
+                this.state.expedition.userColor = this.state.userColor;
                 Services.publishExpedition(this.state.expedition)
                     .then(response => {
                         this.state.isRecording = false;

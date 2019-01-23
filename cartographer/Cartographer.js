@@ -65,7 +65,13 @@ class Cartographer {
         let crossEntropy = manager.crossEntropy(expedition);
         logger.info(`CrossEntropy ${crossEntropy}`);
         manager.updateModel(expedition);
-        let entr = {value: crossEntropy, date: new Date(), expeditionId: expedition.expeditionId};
+        let entr = {
+            value: crossEntropy,
+            date: new Date(),
+            expeditionId: expedition.expeditionId,
+            userId: expedition.userId,  // TODO userId could be requested with a join when we retrieve entropy list in the front.
+            userColor: expedition.userColor  // TODO This could be a design choice and not be stored in the DB, so we have to set a shared config file with colors list
+        };
 
         this.addEntropy(expedition.campaignId, entr)
             .then( () => {

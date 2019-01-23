@@ -41,16 +41,16 @@ class RouteExpedition {
     getExpedition(req, res){
         let expeditionCollection = this.mongoClient.db(this.dbName).collection(this.collectionName);
         expeditionCollection.findOne({_id: req.params.expeditionId})
-        .then( expedition => {
-            if (expedition) {
-                res.status(200).send(expedition);
-            } else {
-                res.status(204).send();
-            }
-        })
-        .catch( ex => {
-            res.status(500).send(ex.message);
-        })
+            .then( expedition => {
+                if (expedition) {
+                    res.status(200).send(expedition);
+                } else {
+                    res.status(204).send();
+                }
+            })
+            .catch( ex => {
+                res.status(500).send(ex.message);
+            });
     }
 }
 

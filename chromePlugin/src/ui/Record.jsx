@@ -70,6 +70,23 @@ export default class Record extends React.Component {  // TODO
     }
 
 	render() {
+        let profile = (
+            <Row>
+                <Col xs={2}>
+                    <p style={{color: this.state.userColor, fontSize:50}}>&#9679;</p>
+                </Col>
+                <Col xs={8}>
+                    <p>Profile ID : {this.state.userId}</p>
+                </Col>
+            </Row>
+        )
+        let infos = (
+            <Row>
+                <Col xs={10}>
+                    <p>Campaign ID : {this.state.campaignId}</p>
+                </Col>
+            </Row>
+        );
         let autoPublish = (
             <Row>
                 <Col componentClass={ControlLabel} xs={2}>
@@ -113,7 +130,8 @@ export default class Record extends React.Component {  // TODO
         );
         return (
             <div>
-                <p>Campaign ID : {this.state.campaignId}</p>
+                {profile}
+                {infos}
                 {autoPublish}
                 {buttonToolbar}
             </div>

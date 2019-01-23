@@ -31,7 +31,8 @@ export default class Campaign extends React.Component {
 					for (let index = start; index < campaign.crossentropy.length; index++) {
 						let entropy = {
 							value:campaign.crossentropy[index].value,
-							date: new Date(campaign.crossentropy[index].date)
+							date: new Date(campaign.crossentropy[index].date),
+							pointColor: am4core.color(campaign.crossentropy[index].userColor)
 						};
 						//console.log(`${JSON.stringify(entropy)}`);
 						this.chart.addData(entropy);
@@ -104,7 +105,8 @@ export default class Campaign extends React.Component {
 		square.height = 10;
 		square.horizontalCenter = "middle";
 		square.verticalCenter = "middle";
-		square.stroke = am4core.color("#2F4858");
+		square.propertyFields.stroke = "pointColor";
+		square.propertyFields.fill = "pointColor";
 		square.strokeWidth = 1;
 
 		this.chart = chart;

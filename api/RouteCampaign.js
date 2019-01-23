@@ -14,6 +14,7 @@ class RouteCampaign {
 
         this.createCampaign = this.createCampaign.bind(this);
         this.getCampaign = this.getCampaign.bind(this);
+        this.joinCampaign = this.joinCampaign.bind(this);
     }
 
     async init(){
@@ -21,6 +22,7 @@ class RouteCampaign {
 
         router.post('/', this.createCampaign);
         router.get('/:campaignId', this.getCampaign);
+        router.put('/:campaignId', this.joinCampaign);
 
         return router;
     }
@@ -58,27 +60,51 @@ class RouteCampaign {
         let collection = this.mongoClient.db(this.dbName).collection(this.collectionName);
 
         collection.insertOne(campaign)
-        .then(result => {
-            res.status(201).send(campaign);
-        })
-        .catch( ex => {
-            res.status(500).send(ex.message);
-        });
+            .then(result => {
+                res.status(201).send(campaign);
+            })
+            .catch( ex => {
+                res.status(500).send(ex.message);
+            });
     }
 
     getCampaign(req, res){
         let campaignCollection = this.mongoClient.db(this.dbName).collection(this.collectionName);
         campaignCollection.findOne({_id: req.params.campaignId})
-        .then ( campaign => {
-            if (campaign === undefined || campaign === null)  {
-                res.status(204).send();
-            } else {
-                res.status(200).send(campaign);
-            }
-        })
-        .catch( ex => {
-            res.status(500).send(ex.message);
-        })
+            .then ( campaign => {
+                if (campaign === undefined || campaign === null)  {
+                    res.status(204).send();
+                } else {
+                    res.status(200).send(campaign);
+                }
+            })
+            .catch( ex => {
+                res.status(500).send(ex.message);
+            });
+    }
+
+    joinCampaign(req, res) {
+        let campaignCollection = this.mongoClient.db(this.dbName).collection(this.collectionName);
+        let userId = uuidv4();
+        campaignCollection.findOneAndUpdate(
+            { _id: req.params.campaignId },
+            { $push: { profiles: userId } },
+            { returnOriginal: false }
+        )
+            .then(data => {
+                if (data.value) {
+                    res.status(200).send({
+                        campaign: data.value,  // TODO Check that mongoDB correctly returns the updated campaign
+                        userId: userId
+                    });
+                } else {
+                    res.status(204).send();
+                }
+            })
+            .catch(ex => {
+                console.error(ex.message);
+                res.status(500).send(ex.message);
+            });
     }
 }
 

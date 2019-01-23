@@ -5,24 +5,33 @@ class Background {
     constructor() {
         this.initialize();
 
+        this.colors = [
+            "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
+            "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
+            "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000",
+            "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080",
+            "#ffffff", "#000000"];  //TODO Set this in a shared between services conf file
+
         this.handleMessage = this.handleMessage.bind(this);
         this.navigationListener = new NavigationListener();
     }
 
     initialize() {
         this.state = {
-            mappedToCampaign : false,
-            windowId : undefined,
-            isRecording : false,
-            campaignId : undefined,
-            autoPublish : false,
-            autoPublishTime : 4000,
-            autoPublishInterval : undefined,
-            expedition : {
+            mappedToCampaign: false,
+            windowId: undefined,
+            isRecording: false,
+            campaignId: undefined,
+            autoPublish: false,
+            autoPublishTime: 4000,
+            autoPublishInterval: undefined,
+            userId: undefined,
+            userColor: undefined,
+            expedition: {
                 campaignId: undefined,
                 events: []
             },
-            message : `Plugin was just initialized`
+            message: `Plugin was just initialized`
         };
     }
 
@@ -55,9 +64,11 @@ class Background {
                     console.log('start');
                     this.state.isRecording = true;
                     this.state.expedition.events = [];
+                    this.state.expedition.userId = this.state.userId;
+                    this.state.expedition.userColor = this.state.userColor;
                     this.navigationListener.startExpedition(this.state);
-                    this.state.autoPublishInterval = setInterval(()=>{
-                        if (this.state.expedition.events.length >0) {
+                    this.state.autoPublishInterval = setInterval(() => {
+                        if (this.state.expedition.events.length > 0) {
                             Services.publishExpedition(this.state.expedition)
                                 .then(response => {
                                     console.log('publishExpe');
@@ -77,15 +88,18 @@ class Background {
                 sendResponse(this.state);
                 return true;
 
-            case 'createCampaign':      
+            case 'createCampaign':
                 Services.createCampaign(msg.options)
                     .then(response => {
-                        if (response.status === 201) {
+                        if (response.status === 200) {
                             this.initialize();
                             this.state.mappedToCampaign = true;
-                            this.state.campaignId = response.data.campaignId;
-                            this.state.expedition.campaignId = response.data.campaignId;
-                            this.state.message = 'Campaign was created'
+                            this.state.campaign = response.data.campaign;
+                            this.state.campaignId = response.data.campaign.campaignId;
+                            this.state.expedition.campaignId = response.data.campaign.campaignId;
+                            this.state.userId = response.data.userId;
+                            this.state.userColor = this.colors[response.data.campaign.profiles.indexOf(response.data.userId) % response.data.campaign.profiles.length];
+                            this.state.message = 'Campaign was created';
                             sendResponse(this.state);
                         }
                         if (response.status === 501) {
@@ -102,23 +116,28 @@ class Background {
                 return true;
 
             case 'joinCampaign':
-                Services.joinCampaign(msg.campaignId)
+                Services.joinCampaign(msg.campaignId, this.state.profile)
                     .then(response => {
+                        chrome.extension.getBackgroundPage().console.log(`Response status is : ${response.status}`);
                         if (response.status === 204) {
                             this.initialize();
                             this.state.message = 'No such campaign';
-                        };
+                        }
                         if (response.status === 200) {
+                            chrome.extension.getBackgroundPage().console.log(`Response data is : ${JSON.stringify(response.data)}`);
                             this.initialize();
                             this.state.mappedToCampaign = true;
-                            this.state.campaignId = response.data.campaignId;
-                            this.state.expedition.campaignId = response.data.campaignId;
+                            this.state.campaign = response.data.campaign;
+                            this.state.campaignId = response.data.campaign.campaignId;
+                            this.state.expedition.campaignId = response.data.campaign.campaignId;
+                            this.state.userId = response.data.userId;
+                            this.state.userColor = this.colors[response.data.campaign.profiles.indexOf(response.data.userId) % response.data.campaign.profiles.length];
                             this.state.message = 'Campaign linked';
-                        };
+                        }
                         if (response.status === 500) {
                             this.initialize();
                             this.state.message = response.data;
-                        };
+                        }
                         sendResponse(this.state);
                     })
                     .catch(e => {
@@ -137,7 +156,7 @@ class Background {
 
             case 'addEventToExpedition':
                 chrome.extension.getBackgroundPage().console.log(`Add event : ${msg.event.type}`);
-                if(this.state.expedition.events){
+                if (this.state.expedition.events) {
                     this.state.expedition.events.push(msg.event);
                 }
                 sendResponse(this.state);
@@ -145,6 +164,8 @@ class Background {
 
             case 'publishExpedition':  // TODO Add url to the expedition object
                 this.state.expedition.result = msg.result;
+                this.state.expedition.userId = this.state.userId;  //TODO This could be easily changed by the client... but does security really matter here ?
+                this.state.expedition.userColor = this.state.userColor;
                 Services.publishExpedition(this.state.expedition)
                     .then(response => {
                         this.state.isRecording = false;

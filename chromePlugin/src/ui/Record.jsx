@@ -90,22 +90,22 @@ export default class Record extends React.Component {  // TODO
         )
         let infos = (
             <Row>
-                <Col xs={12} style={{fontSize:35}}>Campaign</Col>
+                <Col xs={12} style={{fontSize:35}}>Joined Campaign</Col>
                 <Col xs={2}>Id </Col>
                 <Col xs={8}>{this.state.campaignId}</Col>
             </Row>
         );
         let autoPublish = (
             <Row>
-                <Col xs={12} style={{fontSize:40}}>Recording</Col>
+                <Col xs={12} style={{fontSize:35}}>Recording</Col>
                 <Col componentClass={ControlLabel} xs={2}>
-                        Mode:
+                        State:
 				</Col>
                 <Col xs={4}>
                     <Toggle 
                         onClick={this.handleAutoPublish}
-                        on="Auto" 
-                        off="Manual"
+                        on="Record" 
+                        off="Pause"
                         size="tiny"
                         active={this.state.autoPublish}>
                     </Toggle>

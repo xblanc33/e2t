@@ -72,17 +72,18 @@ export default class Record extends React.Component {  // TODO
 	render() {
         let profile = (
             <Row>
-                <Col xs={8} style={{fontSize:40}}>User's Profile</Col>
-                <Col xs={4}>
+                <Col xs={12} style={{fontSize:35}}>User's Profile</Col>
+                <Col xs={2} >Id </Col>
+                <Col xs={10}>{this.state.userId}</Col>
+                <Col xs={2} >Color </Col>
+                <Col xs={10}>
                     <span style={{color: this.state.userColor, fontSize:50}}>&#9679;</span>
                 </Col>
-                <Col xs={2} >Id </Col>
-                <Col xs={8}>{this.state.userId}</Col>
             </Row>
         )
         let infos = (
             <Row>
-                <Col xs={12} style={{fontSize:40}}>Campaign</Col>
+                <Col xs={12} style={{fontSize:35}}>Campaign</Col>
                 <Col xs={2}>Id </Col>
                 <Col xs={8}>{this.state.campaignId}</Col>
             </Row>
@@ -101,12 +102,6 @@ export default class Record extends React.Component {  // TODO
                         size="tiny"
                         active={this.state.autoPublish}>
                     </Toggle>
-                </Col>
-                <Col componentClass={ControlLabel} xs={2}>
-                        each(ms):
-				</Col>
-                <Col xs={4}>
-                    <FormControl id="autoPulishTime" type="text" placeholder="3000" disabled={!this.state.autoPublish}/>
                 </Col>
             </Row>
         );

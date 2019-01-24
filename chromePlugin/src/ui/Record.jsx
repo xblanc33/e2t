@@ -83,8 +83,8 @@ export default class Record extends React.Component {  // TODO
                 <Col xs={12} style={{fontSize:35}}>Test Result</Col>
                 <Col xs={10}>
                     <ButtonToolbar>
-                        <Button bsStyle="success" id="success" onClick={this.handlePublish} disabled={this.state.autoPublish}>Success</Button>
-                        <Button bsStyle="danger" id="failure" onClick={this.handlePublish} disabled={this.state.autoPublish}>Failure</Button>
+                        <Button bsStyle="success" id="success">Success</Button>
+                        <Button bsStyle="danger" id="failure">Failure</Button>
                     </ButtonToolbar>
                 </Col>
             </Row>

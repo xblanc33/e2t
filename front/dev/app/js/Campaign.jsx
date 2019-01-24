@@ -7,7 +7,7 @@ import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
 am4core.useTheme(am4themes_animated);
 
-const REFRESH_TEMPO = 3000;
+const REFRESH_TEMPO = 500;
 
 export default class Campaign extends React.Component {
 

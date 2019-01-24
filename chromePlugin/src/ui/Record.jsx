@@ -72,25 +72,26 @@ export default class Record extends React.Component {  // TODO
 	render() {
         let profile = (
             <Row>
-                <Col xs={2}>
-                    <p style={{color: this.state.userColor, fontSize:50}}>&#9679;</p>
+                <Col xs={8} style={{fontSize:40}}>User's Profile</Col>
+                <Col xs={4}>
+                    <span style={{color: this.state.userColor, fontSize:50}}>&#9679;</span>
                 </Col>
-                <Col xs={8}>
-                    <p>Profile ID : {this.state.userId}</p>
-                </Col>
+                <Col xs={2} >Id </Col>
+                <Col xs={8}>{this.state.userId}</Col>
             </Row>
         )
         let infos = (
             <Row>
-                <Col xs={10}>
-                    <p>Campaign ID : {this.state.campaignId}</p>
-                </Col>
+                <Col xs={12} style={{fontSize:40}}>Campaign</Col>
+                <Col xs={2}>Id </Col>
+                <Col xs={8}>{this.state.campaignId}</Col>
             </Row>
         );
         let autoPublish = (
             <Row>
+                <Col xs={12} style={{fontSize:40}}>Recording</Col>
                 <Col componentClass={ControlLabel} xs={2}>
-                        Recording:
+                        Mode:
 				</Col>
                 <Col xs={4}>
                     <Toggle 

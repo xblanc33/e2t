@@ -77,7 +77,14 @@ export default class Record extends React.Component {  // TODO
                 <Col xs={10}>{this.state.userId}</Col>
                 <Col xs={2} >Color </Col>
                 <Col xs={10}>
-                    <span style={{color: this.state.userColor, fontSize:50}}>&#9679;</span>
+                    <table width="20" height="20" align="left" style={{"background-color": this.state.userColor}}  cellPadding="2" border="3" border-style="ridge">
+                        <tbody>
+                            <tr>
+                                <td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </Col>
             </Row>
         )

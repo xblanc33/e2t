@@ -56,12 +56,10 @@ class Background {
                 this.state.autoPublish = msg.autoPublish;
                 this.state.autoPublishTime = msg.autoPublishTime;
                 if (!this.state.autoPublish) {
-                    console.log('clear');
                     if (this.state.autoPublishInterval) {
                         clearInterval(this.state.autoPublishInterval);
                     }
                 } else {
-                    console.log('start');
                     this.state.isRecording = true;
                     this.state.expedition.events = [];
                     this.state.expedition.userId = this.state.userId;
@@ -71,7 +69,6 @@ class Background {
                         if (this.state.expedition.events.length > 0) {
                             Services.publishExpedition(this.state.expedition)
                                 .then(response => {
-                                    console.log('publishExpe');
                                     this.state.isRecording = false;
                                     this.state.expedition.events = [];
                                 })

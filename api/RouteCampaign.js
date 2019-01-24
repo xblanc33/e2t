@@ -54,6 +54,7 @@ class RouteCampaign {
             lastUpdate : new Date(),
             depth : depth,
             probaOfUnknown : probaOfUnknown,
+            profiles: [],
             expedition : [],
             crossentropy : []
         };
@@ -87,10 +88,10 @@ class RouteCampaign {
         let campaignCollection = this.mongoClient.db(this.dbName).collection(this.collectionName);
         let userId = uuidv4();
         campaignCollection.findOneAndUpdate(
-            { _id: req.params.campaignId },
-            { $push: { profiles: userId } },
-            { returnOriginal: false }
-        )
+                { _id: req.params.campaignId },
+                { $push: { profiles: userId } },
+                { returnOriginal: false }
+            )
             .then(data => {
                 if (data.value) {
                     res.status(200).send({

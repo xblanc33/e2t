@@ -12,13 +12,17 @@ const PROBA = 0.000001; //Gives entropy of 19
 
 
 class Monkey {
-    constructor(explorationLength) {
-        this.explorationLength = explorationLength;
+    constructor(options) {
+        this.options = options;
+        if (!this.options.headless) this.options.headless = HEADLESS;
+        if (!this.options.slowmo) this.options.slowmo = SLOW_MOTION;
+        if (!this.options.depth) this.options.depth = DEPTH;
+        if (!this.options.proba) this.options.proba = PROBA;
+
     }
 
     async init() {
-        //this.browser = await puppeteer.launch({slowMo : SLOW_MOTION, headless : HEADLESS});
-        this.browser = await puppeteer.launch();
+        this.browser = await puppeteer.launch({slowMo : this.options.slowmo, headless : this.options.headless});
         this.page = await this.browser.newPage();
     }
 
@@ -35,17 +39,26 @@ class Monkey {
     }
 
     async createCampaign() {
-        let response = await axios.post(`${BASE_URL}/api/campaign`, {options: {
-            depth: DEPTH,
-            proba: PROBA
+        let creationResp = await axios.post(`${BASE_URL}/api/campaign`, {options: {
+            depth: this.options.depth,
+            proba: this.options.proba
         }});
-        if (response.status === 201) {
-            this.campaignId = response.data.campaignId;
+        if (creationResp.status === 201) {
+            this.campaignId = creationResp.data.campaignId;
             console.log(`campaign created : ${this.campaignId}`);
         }
-        if (response.status === 501) {
+        if (creationResp.status === 501) {
             throw new Exception('501: Cannot create campaign');
         }
+        let joinResp = await axios.put(`${BASE_URL}/api/campaign/${this.campaignId}`);
+        if (joinResp.status === 200) {
+            this.userId = joinResp.data.userId;
+            console.log(`userId : ${this.userId}`);
+        }
+        if (creationResp.status === 500) {
+            throw new Exception('501: Cannot join campaign');
+        }
+        
     }
 
     async fetch() {
@@ -91,8 +104,10 @@ class Monkey {
         let expedition = {};
         expedition.campaignId = this.campaignId;
         expedition.events = [];
+        expedition.userId = this.userId;
+        expedition.userColor = "#e6194b";
         await this.page.goto(URL);
-        for (let index = 0; index < this.explorationLength; index++) {
+        for (let index = 0; index <= this.options.depth; index++) {
             let hrefIndex = Math.floor(Math.random() * Math.floor(this.hrefs.length));
             await this.page.click(this.hrefs[hrefIndex].selector);
             expedition.events.push(this.hrefs[hrefIndex]);

@@ -51,42 +51,12 @@ class Background {
                 sendResponse(this.windowId);
                 return true;
 
-            case 'launchAutoRecord':
-                console.log(`launchAutoRecord:${msg.autoPublish}`);
-                this.state.autoPublish = msg.autoPublish;
-                this.state.autoPublishTime = msg.autoPublishTime;
-                if (!this.state.autoPublish) {
-                    if (this.state.autoPublishInterval) {
-                        clearInterval(this.state.autoPublishInterval);
-                    }
-                } else {
-                    this.state.isRecording = true;
-                    this.state.expedition.events = [];
-                    this.state.expedition.userId = this.state.userId;
-                    this.state.expedition.userColor = this.state.userColor;
-                    this.navigationListener.startExpedition(this.state);
-                    this.state.autoPublishInterval = setInterval(() => {
-                        if (this.state.expedition.events.length > 0) {
-                            Services.publishExpedition(this.state.expedition)
-                                .then(response => {
-                                    this.state.isRecording = false;
-                                    this.state.expedition.events = [];
-                                })
-                                .catch(e => {
-                                    this.state.message = e.message;
-                                });
-                        }
-                    }, this.state.autoPublishTime);
-                }
-                sendResponse(this.state);
-                return true;
-
             case 'getState':
                 sendResponse(this.state);
                 return true;
 
             case 'createCampaign':
-                Services.createCampaign(msg.options)
+                Services.createAndJoinCampaign(msg.options)
                     .then(response => {
                         if (response.status === 200) {
                             this.initialize();
@@ -147,22 +117,40 @@ class Background {
             case 'startExpedition':
                 this.state.isRecording = true;
                 this.state.expedition.events = [];
+                this.state.expedition.userId = this.state.userId;  //TODO This could be easily changed by the client... but does security really matter here ?
+                this.state.expedition.userColor = this.state.userColor;
                 this.navigationListener.startExpedition(this.state);
+                sendResponse(this.state);
+                return true;
+
+            case 'stopExpedition':
+                this.state.isRecording = false;
+                this.state.expedition.events = [];
                 sendResponse(this.state);
                 return true;
 
             case 'addEventToExpedition':
                 chrome.extension.getBackgroundPage().console.log(`Add event : ${msg.event.type}`);
-                if (this.state.expedition.events) {
+                if (this.state.isRecording && this.state.expedition.events) {
                     this.state.expedition.events.push(msg.event);
+                    if (this.state.expedition.events.length > this.state.campaign.depth) {
+                        Services.publishExpedition(this.state.expedition)
+                            .then(response => {
+                                this.state.expedition.events.shift();
+                                sendResponse(this.state);
+                            })
+                            .catch(e => {
+                                this.state.message = e.message;
+                                sendResponse(this.state);
+                            });
+                    }
+                } else {
+                    sendResponse(this.state);
                 }
-                sendResponse(this.state);
                 return true;
 
             case 'publishExpedition':  // TODO Add url to the expedition object
                 this.state.expedition.result = msg.result;
-                this.state.expedition.userId = this.state.userId;  //TODO This could be easily changed by the client... but does security really matter here ?
-                this.state.expedition.userColor = this.state.userColor;
                 Services.publishExpedition(this.state.expedition)
                     .then(response => {
                         this.state.isRecording = false;
@@ -173,12 +161,6 @@ class Background {
                         this.state.message = e.message;
                         sendResponse(this.state);
                     });
-                return true;
-
-            case 'deleteExpedition':
-                this.state.expedition.events = [];
-                this.state.isRecording = false;
-                sendResponse(this.state);
                 return true;
         }
     }

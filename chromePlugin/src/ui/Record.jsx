@@ -6,14 +6,9 @@ export default class Record extends React.Component {  // TODO
 	constructor(props) {
         super(props);
         this.state = {
-            isRecording : false,
-            autoPublish : false,
-            autoPublishTime : 4000,
+            isRecording : false
         };     
-		this.handleStart = this.handleStart.bind(this);
-		this.handlePublish = this.handlePublish.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
-        this.handleAutoPublish = this.handleAutoPublish.bind(this);
+		this.handleRecording = this.handleRecording.bind(this);
 	}
 
 	componentDidMount() {
@@ -25,50 +20,21 @@ export default class Record extends React.Component {  // TODO
 		);
     }
     
-    handleStart(event) {
-        event.preventDefault();
-		chrome.runtime.sendMessage(
-            { kind: 'startExpedition' },
-            response => this.setState(response)
-        );
+    handleRecording(event) {
+        //event.preventDefault();
+        if (!this.state.isRecording) {
+            chrome.runtime.sendMessage(
+                { kind: 'startExpedition' },
+                response => this.setState(response)
+            );
+        } else {
+            chrome.runtime.sendMessage(
+                { kind: 'stopExpedition' },
+                response => this.setState(response)
+            );
+        }
 	}
-
-	handlePublish(event) {
-        event.preventDefault();
-        chrome.runtime.sendMessage(
-            {
-                kind: 'publishExpedition',
-                result: event.target.id
-            },
-            response => this.setState(response)
-        );
-    }
     
-    handleDelete(event) {
-        event.preventDefault();
-        chrome.runtime.sendMessage(
-            {kind: 'deleteExpedition'},
-            response => this.state.setState(response)
-        );
-    }
-
-    handleAutoPublish() {
-        this.setState({autoPublish: !this.state.autoPublish}, this.launchAutoPublish);
-    }
-
-    handleAutoPublishTime(event) {
-        this.setState({autoPublishTime: event.target.value}, this.launchAutoPublish);
-    }
-
-    launchAutoPublish() {
-        chrome.runtime.sendMessage(
-            {kind: 'launchAutoRecord',
-            autoPublish: this.state.autoPublish,
-            autoPublishTime: this.state.autoPublishTime
-            }
-        );
-    }
-
 	render() {
         let profile = (
             <Row>
@@ -77,7 +43,7 @@ export default class Record extends React.Component {  // TODO
                 <Col xs={10}>{this.state.userId}</Col>
                 <Col xs={2} >Color </Col>
                 <Col xs={10}>
-                    <table width="20" height="20" align="left" style={{"background-color": this.state.userColor}}  cellPadding="2" border="3" border-style="ridge">
+                    <table width="20" height="20" align="left" style={{backgroundColor: this.state.userColor}}  cellPadding="2" border="3" border-style="ridge">
                         <tbody>
                             <tr>
                                 <td>
@@ -103,32 +69,27 @@ export default class Record extends React.Component {  // TODO
 				</Col>
                 <Col xs={4}>
                     <Toggle 
-                        onClick={this.handleAutoPublish}
+                        onClick={this.handleRecording}
                         on="Record" 
                         off="Pause"
                         size="tiny"
-                        active={this.state.autoPublish}>
+                        active={this.state.isRecording}>
                     </Toggle>
                 </Col>
             </Row>
         );
         let buttonToolbar = this.state.isRecording?(  // True if the array is defined (even if empty)
             <Row>
+                <Col xs={12} style={{fontSize:35}}>Test Result</Col>
                 <Col xs={10}>
                     <ButtonToolbar>
                         <Button bsStyle="success" id="success" onClick={this.handlePublish} disabled={this.state.autoPublish}>Success</Button>
                         <Button bsStyle="danger" id="failure" onClick={this.handlePublish} disabled={this.state.autoPublish}>Failure</Button>
-                        <Button bsStyle="primary" onClick={this.handleDelete} disabled={this.state.autoPublish}>Cancel</Button>
                     </ButtonToolbar>
                 </Col>
             </Row>
         ):(
             <Row>
-                <Col xs={10}>
-                    <ButtonToolbar>
-                        <Button bsStyle="primary" onClick={this.handleStart} disabled={this.state.autoPublish}>Record</Button>
-                    </ButtonToolbar>
-                </Col>
             </Row>
         );
         return (

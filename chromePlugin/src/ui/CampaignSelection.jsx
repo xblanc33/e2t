@@ -76,7 +76,7 @@ export default class CampaignSelection extends React.Component {
 							depth:
 						</Col>
 						<Col xs={10}>
-							<FormControl id="depth" type="text" placeholder="4"/>
+							<FormControl id="depth" type="text" placeholder="3"/>
 						</Col>
 					</FormGroup>
 					<FormGroup>
@@ -84,7 +84,7 @@ export default class CampaignSelection extends React.Component {
 							proba:
 						</Col>
 						<Col xs={10}>
-							<FormControl id="proba" type="text" placeholder="0.001"/>
+							<FormControl id="proba" type="text" placeholder="0.000001"/>
 						</Col>
 					</FormGroup>
 				</Form>

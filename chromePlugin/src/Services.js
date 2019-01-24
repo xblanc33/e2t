@@ -3,7 +3,7 @@ let axios = require('axios');
 class Services {
     constructor(){}
 
-    static createCampaign(options){
+    static createAndJoinCampaign(options){
         return axios.post(`${BASE_URL}/api/campaign`, {options:options})
             .then(response => {
                 if(response.status === 201){

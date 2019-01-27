@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, Panel } from 'react-bootstrap';
 import {getCampaign} from './scenarioService.js';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -18,15 +18,17 @@ export default class Campaign extends React.Component {
 		this.state = {
 		  campaignId : match.params.id,
 		  campaign : undefined,
+		  userId : undefined,
 		  loaded : false
 		};
+		this.setUserId = this.setUserId.bind(this);
 	}
 
 	updateCampaign() {
 		if (this.state.campaignId) {
 			getCampaign(this.state.campaignId)
 				.then(campaign => {
-					let start = this.chart.data.length;
+					let start = this.campaignChart.data.length;
 
 					for (let index = start; index < campaign.crossentropy.length; index++) {
 						let entropy = {
@@ -35,7 +37,10 @@ export default class Campaign extends React.Component {
 							pointColor: am4core.color(campaign.crossentropy[index].userColor)
 						};
 						//console.log(`${JSON.stringify(entropy)}`);
-						this.chart.addData(entropy);
+						this.campaignChart.addData(entropy);
+						if (campaign.crossentropy[index].userId === this.userId) {
+							this.userChart.addData(entropy);
+						}
 					}
 					if (!this.state.loaded) {
 						this.setState({
@@ -55,14 +60,33 @@ export default class Campaign extends React.Component {
 		}
 	}
 
+	setUserId(event) {
+		event.preventDefault();
+		console.log(document.getElementById('userId').value);
+		this.userId = document.getElementById('userId').value;
+	}
+
 	componentWillMount() {
 	}
 
 	componentDidMount() {
 		let interval = setInterval(() => this.updateCampaign(), REFRESH_TEMPO);
 		this.interval = interval;
+		this.campaignChart = this.createChart("champEntropy");
+		this.userChart = this.createChart("userEntropy");
+	}
 
-		let chart = am4core.create("chartdiv", am4charts.XYChart);
+	componentWillUnmount() {
+		if (this.campaignChart) {
+		  this.campaignChart.dispose();
+		}
+		if (this.interval) {
+			clearInterval(this.interval);
+		}
+	}
+
+	createChart(elementId) {
+		let chart = am4core.create(elementId, am4charts.XYChart);
 		chart.data = [];
 		let dateXAxis = chart.xAxes.push(new am4charts.DateAxis());
 		dateXAxis.renderer.grid.template.location = 0;
@@ -109,17 +133,8 @@ export default class Campaign extends React.Component {
 		square.propertyFields.fill = "pointColor";
 		square.strokeWidth = 1;
 
-		this.chart = chart;
+		return chart;
 	}
-
-	componentWillUnmount() {
-		if (this.chart) {
-		  this.chart.dispose();
-		}
-		if (this.interval) {
-			clearInterval(this.interval);
-		}
-	  }
 
 	
 	render() {
@@ -178,12 +193,48 @@ export default class Campaign extends React.Component {
 			welcomeMsg = (<div>Use our plugin to create a campaign</div>);
 		}
 
+		let userPanel = (
+			<Panel>
+  				<Panel.Heading>
+      			<Panel.Title componentClass="h3">User Entropy</Panel.Title>
+    			</Panel.Heading>
+    			<Panel.Body>
+					<Form horizontal onSubmit={this.setUserId} >
+						<FormGroup>
+							<Col componentClass={ControlLabel} md={2} lg={2}>
+								UserId
+							</Col>
+							<Col md={8} lg={8}>
+								<FormControl id="userId" type="text" placeholder="0228f330-8b64-4858-a325-7f3e23e900be"/>
+							</Col>
+						</FormGroup>
+						<FormGroup>
+							<Col md={12} lg={12}>
+								<Button type="submit">Set User Id</Button>
+							</Col>
+						</FormGroup>
+					</Form>
+					<div id="userEntropy" style={{ width: "100%", height: "500px", visibility:"visible"}}></div>
+				</Panel.Body>
+  			</Panel>
+		);
+
+		let campaignPanel = (
+			<Panel>
+  				<Panel.Heading>
+      			<Panel.Title componentClass="h3">Campaign Entropy</Panel.Title>
+    			</Panel.Heading>
+    			<Panel.Body>
+					<div id="champEntropy" style={{ width: "100%", height: "500px" }}></div>
+				</Panel.Body>
+			</Panel>
+		);
+
 		return (
 			<div>
 				{welcomeMsg}
-                <Row>
-					<div id="chartdiv" style={{ width: "100%", height: "500px" }}></div>
-                </Row>
+				{userPanel}
+				{campaignPanel}
 			</div>
 		);
 	}

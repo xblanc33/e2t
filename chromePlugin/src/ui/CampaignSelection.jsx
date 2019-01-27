@@ -1,6 +1,8 @@
 import React from 'react';
 import { Form, Col, FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
 
+const PROBA = 0.000001; 
+
 export default class CampaignSelection extends React.Component {
 
 	constructor(props) {
@@ -27,7 +29,7 @@ export default class CampaignSelection extends React.Component {
 		event.preventDefault();
 
 		let depth = document.getElementById('depth').value;
-		let proba = document.getElementById('proba').value;
+		let proba = PROBA;
         
 		chrome.runtime.sendMessage(
 			{
@@ -77,14 +79,6 @@ export default class CampaignSelection extends React.Component {
 						</Col>
 						<Col xs={10}>
 							<FormControl id="depth" type="text" placeholder="3"/>
-						</Col>
-					</FormGroup>
-					<FormGroup>
-						<Col componentClass={ControlLabel} xs={2}>
-							proba:
-						</Col>
-						<Col xs={10}>
-							<FormControl id="proba" type="text" placeholder="0.000001"/>
 						</Col>
 					</FormGroup>
 				</Form>

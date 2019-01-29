@@ -29,7 +29,7 @@ class NavigationListener {
     
     webNavigationCompleted({tabId, frameId}) {
         if (this.tab && (this.tab.id === tabId  ))  {
-            if (frameId >= 0) {
+            if (frameId == 0) {
                 chrome.tabs.executeScript(
                     this.tab.id,
                     {file: 'listener.js'},

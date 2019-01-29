@@ -137,17 +137,13 @@ class Background {
                         Services.publishExpedition(this.state.expedition)
                             .then(response => {
                                 this.state.expedition.events.shift();
-                                sendResponse(this.state);
                             })
                             .catch(e => {
                                 this.state.message = e.message;
-                                sendResponse(this.state);
                             });
                     }
-                } else {
-                    sendResponse(this.state);
                 }
-                return true;
+                return false;  //TODO sendReponse raise an "Attempting to use a disconnected port object" error. Probably because the onPageListener tab (??) doesn't exist anymore
 
             case 'publishExpedition':  // TODO Add url to the expedition object
                 this.state.expedition.result = msg.result;

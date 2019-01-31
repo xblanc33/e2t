@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
+    "@medv/finder": "^1.1.1",
     "axios": "^0.16.2",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.2",
@@ -21,6 +22,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "copy-webpack-plugin": "^4.6.0",
+    "css-selector-generator": "^1.2.0",
     "html-webpack-plugin": "^3.2.0",
     "react": "^16.6.3",
     "react-bootstrap": "^0.31.3",

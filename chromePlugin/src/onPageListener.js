@@ -1,4 +1,6 @@
-import { select } from './optimal-select.js';
+//import { selectOptimal } from './optimal-select.js';
+//import { CssSelectGenerator } from './css-selector-generator.js';
+import finder from '@medv/finder';
 
 function attach() {
     console.log('attach');
@@ -41,7 +43,7 @@ function handleInput(e) {
         const type = e.type;
         const selector = computeSelector(e.target);
         const value = e.target.value;
-        handleAllEvents(type, selector, value);
+        handleEvent(type, selector, value);
     }
 }
 
@@ -70,7 +72,7 @@ function handleChange(e) {
         const type = e.type;
         const selector = computeSelector(e.target);
         const value = e.target.value;
-        handleAllEvents(type, selector, value);
+        handleEvent(type, selector, value);
     }
 }
 
@@ -79,7 +81,7 @@ function handleClick (e) {
         const type = e.type;
         const selector = computeSelector(e.target);
         const value = 'click';
-        handleAllEvents(type, selector, value);
+        handleEvent(type, selector, value);
     }
 }
 
@@ -88,11 +90,11 @@ function handleSubmit (e) {
         const type = e.type;
         const selector = computeSelector(e.target);
         const value = 'submit';
-        handleAllEvents(type, selector, value);
+        handleEvent(type, selector, value);
     }
 }
 
-function handleAllEvents(type, selector, value){
+function handleEvent(type, selector, value){
     if (isEmpty(type)) return undefined;
     if (isEmpty(selector)) return undefined;
     if (isEmpty(value)) return undefined;
@@ -112,11 +114,22 @@ function isEmpty(field) {
 }
 
 function computeSelector(el) {
-    return computeSelectorOptimal(el);
+    //return computeSelectorOptimal(el);
+    //return computeSelectorCssSelectGenerator(el);
+    return computeSelectorFinder(el);
+}
+
+function computeSelectorFinder(el) {
+    return finder(el);
+}
+
+function computeSelectorCssSelectGenerator(el) {
+    let generator = new CssSelectGenerator;
+    return generator.getSelector(el);
 }
 
 function computeSelectorOptimal(el) {
-    return select(el, {
+    return selectOptimal(el, {
         root: document,
         priority: ['id','class','href','src'],
         ignore: {

@@ -115,7 +115,7 @@ export default class Campaign extends React.Component {
 		series.dataFields.valueY = "value";
 		series.interpolationDuration = 500;
 		series.defaultState.transitionDuration = 0;
-		series.tensionX = 0.8;
+		series.tensionX = 1;
 		series.tooltipText = "{value}";
 		series.minBulletDistance = 15;
 

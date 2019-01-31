@@ -1,0 +1,33 @@
+{
+  "name": "quizz",
+  "version": "1.0.0",
+  "description": "validation",
+  "main": "ops/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "webpack --config=webpack/debug.config.js",
+    "debug-watch": "webpack --config=webpack/debug.config.js --watch"
+  },
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "axios": "^0.18.0",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "bootstrap": "^4.2.1",
+    "copy-webpack-plugin": "^4.6.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "highcharts": "^7.0.1",
+    "highcharts-react-official": "^2.0.0",
+    "path": "^0.12.7",
+    "react": "^16.7.0",
+    "react-bootstrap": "^0.32.4",
+    "react-dom": "^16.7.0",
+    "react-router-dom": "^4.3.1",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-merge": "^4.1.5"
+  }
+}

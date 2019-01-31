@@ -1,0 +1,136 @@
+{
+    "easy":[
+        {
+            "question":"True && True",
+            "answer":true
+        },
+        {
+            "question":"True && False",
+            "answer":false
+        },
+        {
+            "question":"False && True",
+            "answer":false
+        },
+        {
+            "question":"False && False",
+            "answer":false
+        },
+        {
+            "question":"True || True",
+            "answer":true
+        },
+        {
+            "question":"True || False",
+            "answer":true
+        },
+        {
+            "question":"False || True",
+            "answer":true
+        },
+        {
+            "question":"False || False",
+            "answer":false
+        }
+    ],
+    "medium":[
+        {
+            "question":"!True && True",
+            "answer":false
+        },
+        {
+            "question":"!True && False",
+            "answer":false
+        },
+        {
+            "question":"!False && True",
+            "answer":true
+        },
+        {
+            "question":"!False && False",
+            "answer":false
+        },
+        {
+            "question":"!True || True",
+            "answer":true
+        },
+        {
+            "question":"!True || False",
+            "answer":false
+        },
+        {
+            "question":"!False || True",
+            "answer":true
+        },
+        {
+            "question":"!False || False",
+            "answer":true
+        },
+        {
+            "question":"True && !True",
+            "answer":false
+        },
+        {
+            "question":"True && !False",
+            "answer":true
+        },
+        {
+            "question":"False && !True",
+            "answer":false
+        },
+        {
+            "question":"False && !False",
+            "answer":false
+        },
+        {
+            "question":"True || !True",
+            "answer":true
+        },
+        {
+            "question":"True || !False",
+            "answer":true
+        },
+        {
+            "question":"False || !True",
+            "answer":false
+        },
+        {
+            "question":"False || !False",
+            "answer":true
+        }
+    ],
+    "hard":[
+        {
+            "question":"True || !(True && True)",
+            "answer":true
+        },
+        {
+            "question":"True && !(True || False)",
+            "answer":false
+        },
+        {
+            "question":"False && True",
+            "answer":false
+        },
+        {
+            "question":"False && False",
+            "answer":false
+        },
+        {
+            "question":"True || True",
+            "answer":true
+        },
+        {
+            "question":"True || False",
+            "answer":true
+        },
+        {
+            "question":"False || True",
+            "answer":true
+        },
+        {
+            "question":"False || False",
+            "answer":false
+        }
+    ]
+}

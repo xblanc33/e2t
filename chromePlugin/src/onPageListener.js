@@ -32,12 +32,9 @@ function attach() {
         }
     );
 
-    //document.body.addEventListener('click', handleClick, true);
-	all.forEach(
-        element => {
-            element.addEventListener('click', handleClick, true);
-        }
-    );
+    window.addEventListener('click', handleClick, true);
+
+    window.addEventListener('mousedown', handleMouseDown, true);
     
     document.body.addEventListener('submit', handleSubmit, true);
 }
@@ -94,6 +91,19 @@ function handleClick (e) {
     }
 }
 
+function handleMouseDown (e) {
+    if (e.alreadyHandled) {
+        return;
+    } 
+    e.alreadyHandled = true;
+    if (e.type === 'mousedown') {
+        const type = e.type;
+        const selector = computeSelector(e.target);
+        const value = 'mousedown';
+        handleEvent(type, selector, value);
+    }
+}
+
 function handleSubmit (e) {
     if (e.type === 'submit') {
         const type = e.type;
@@ -123,12 +133,12 @@ function isEmpty(field) {
 }
 
 function computeSelector(el) {
-    console.log('start selector');
+    //console.log('start selector');
     let selector;
     //selector = computeSelectorOptimal(el);
     selector = computeSelectorCssSelectGenerator(el);
     //selector = computeSelectorFinder(el);
-    console.log('end selector');
+    //console.log('end selector');
     return selector;
 }
 

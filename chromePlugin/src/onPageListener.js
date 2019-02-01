@@ -1,6 +1,6 @@
 //import { selectOptimal } from './optimal-select.js';
-//import { CssSelectGenerator } from './css-selector-generator.js';
-import finder from '@medv/finder';
+import CssSelectGenerator from 'css-selector-generator';
+//import finder from '@medv/finder'; //too slow
 
 function attach() {
     console.log('attach');
@@ -18,7 +18,7 @@ function attach() {
 		subtree: true
 	};
 
-	const all = document.querySelectorAll('body *');
+	const all = document.querySelectorAll('*');
 	all.forEach(
         element => {
             observer.observe(element, config);
@@ -32,7 +32,12 @@ function attach() {
         }
     );
 
-    document.body.addEventListener('click', handleClick, true);
+    //document.body.addEventListener('click', handleClick, true);
+	all.forEach(
+        element => {
+            element.addEventListener('click', handleClick, true);
+        }
+    );
     
     document.body.addEventListener('submit', handleSubmit, true);
 }
@@ -77,6 +82,10 @@ function handleChange(e) {
 }
 
 function handleClick (e) {
+    if (e.alreadyHandled) {
+        return;
+    } 
+    e.alreadyHandled = true;
     if (e.type === 'click') {
         const type = e.type;
         const selector = computeSelector(e.target);
@@ -114,9 +123,13 @@ function isEmpty(field) {
 }
 
 function computeSelector(el) {
-    //return computeSelectorOptimal(el);
-    //return computeSelectorCssSelectGenerator(el);
-    return computeSelectorFinder(el);
+    console.log('start selector');
+    let selector;
+    //selector = computeSelectorOptimal(el);
+    selector = computeSelectorCssSelectGenerator(el);
+    //selector = computeSelectorFinder(el);
+    console.log('end selector');
+    return selector;
 }
 
 function computeSelectorFinder(el) {

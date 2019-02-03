@@ -30,7 +30,7 @@ module.exports = {
             { from: './src/popup.html', to: 'popup.html' },
             { from: './src/css/bootstrap.min.css', to: 'css/bootstrap.min.css' },
             { from: './src/css/bootstrap-theme.min.css', to: 'css/bootstrap-theme.min.css' },
-            { from: './node_modules/react-bootstrap-toggle/dist/bootstrap2-toggle.css', to: 'css/bootstrap2-toggle.css' }
+            { from: './src/css/bootstrap2-toggle.css', to: 'css/bootstrap2-toggle.css' }
         ]),
     ]
 };

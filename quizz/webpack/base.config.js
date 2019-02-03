@@ -23,7 +23,10 @@ var config = {
 	},
 	plugins: [
 		new CopyPlugin([
-			{from: './dev/app/index.html', to: 'app/index.html'}
+			{from: './dev/app/index.html', to: 'app/index.html'},
+			{ from: './dev/app/css/bootstrap.min.css', to: 'app/css/bootstrap.min.css' },
+            { from: './dev/app/css/bootstrap-theme.min.css', to: 'app/css/bootstrap-theme.min.css' },
+            { from: './dev/app/css/bootstrap2-toggle.css', to: 'app/css/bootstrap2-toggle.css' }
 		])
 	]
 };

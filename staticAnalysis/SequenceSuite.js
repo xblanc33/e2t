@@ -20,21 +20,46 @@ class SequenceSuite {
     }
 
     getMoreNatural() {
+        if (this.suite.length === 0) {
+            throw 'Suite is empty';
+        }
+
+        if (this.suite.length === 1) {
+            return {
+                crossEntropy : UPPER_BOUND,
+                index : 0,
+                sequence : this.suite[0]
+            }
+        }
         let moreNatural = {
-            crossEntropy : 0
+            crossEntropy : UPPER_BOUND
         }
         this.suite.forEach( (sequence, index) => {
             let model = new NaturalnessModel();
-            let other = this.suite.slice(0).splice(index, 1);
-            other.forEach(seq => model.learn(seq));
+            let suiteCopy = this.suite.slice(0);
+            suiteCopy.splice(index, 1);
+            suiteCopy.forEach(seq => model.learn(seq));
             let crossEntropy = model.crossEntropy(sequence);
-            if (crossEntropy > moreNatural.crossEntropy) {
+            if (crossEntropy < moreNatural.crossEntropy) {
                 moreNatural.crossEntropy = crossEntropy;
                 moreNatural.sequence = sequence;
                 moreNatural.index = index;
             }
         });
         return moreNatural;
+    }
+
+    rank() {
+        if (this.suite.length === 0) return [];
+
+        let rank = [];
+        let moreNatural = this.getMoreNatural();
+        rank.push({sequence:moreNatural.sequence, crossEntropy:moreNatural.crossEntropy});
+        let suiteCopy = this.suite.slice(0);
+        suiteCopy.splice(moreNatural.index, 1);
+        let other = new SequenceSuite(suiteCopy);
+        rank.push(...other.rank());
+        return rank;
     }
 }
 

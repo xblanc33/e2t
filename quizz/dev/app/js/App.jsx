@@ -1,6 +1,7 @@
 import React from 'react';
 import {render} from 'react-dom';
 import { Grid } from 'react-bootstrap';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import SelectQuizz from './SelectQuizz.jsx';
 import Quizz from './Quizz.jsx';
 
@@ -30,9 +31,12 @@ class App extends React.Component {
 			mainWindow = (<Quizz level={this.state.selectedQuizz}/>);
 		}
 		return (
-			<Grid>
-				{mainWindow}
-			</Grid>
+
+			<Router>
+				<Route exact path="/" component={SelectQuizz} />
+				<Route path="/quizz" component={Quizz} />
+				<Route path="/result" component={Result} />
+    		</Router>
 		);
 	}
 }

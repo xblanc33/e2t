@@ -1,6 +1,21 @@
-//import { selectOptimal } from './optimal-select.js';
 import CssSelectGenerator from 'css-selector-generator';
-//import finder from '@medv/finder'; //too slow
+//import {record} from 'rrweb';
+
+/*record({
+    emit(event) {
+        chrome.runtime.sendMessage({
+            kind:'addEventToExpedition',
+            event: {
+                type: 'rrweb',
+                selector: 'rrweb',
+                value: JSON.stringify(event)
+            }
+        });
+    },
+  });*/
+
+
+attach();
 
 function attach() {
     console.log('attach');
@@ -133,35 +148,12 @@ function isEmpty(field) {
 }
 
 function computeSelector(el) {
-    //console.log('start selector');
     let selector;
-    //selector = computeSelectorOptimal(el);
     selector = computeSelectorCssSelectGenerator(el);
-    //selector = computeSelectorFinder(el);
-    //console.log('end selector');
     return selector;
-}
-
-function computeSelectorFinder(el) {
-    return finder(el);
 }
 
 function computeSelectorCssSelectGenerator(el) {
     let generator = new CssSelectGenerator;
     return generator.getSelector(el);
 }
-
-function computeSelectorOptimal(el) {
-    return selectOptimal(el, {
-        root: document,
-        priority: ['id','class','href','src'],
-        ignore: {
-            class(className) {
-                return (className==='class') || (className.indexOf('ng-') !== -1);
-            }
-        }
-    });
-}
-
-attach();
-

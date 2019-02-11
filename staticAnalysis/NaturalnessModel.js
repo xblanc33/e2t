@@ -1,6 +1,6 @@
 const Sequence = require('./Sequence.js').Sequence;
 
-const PROBA_OF_UNKNOWN = 0.000001;
+const PROBA_OF_UNKNOWN = 0;//0.000001;
 const DEPTH = 3;
 
 class NaturalnessModel {
@@ -39,25 +39,30 @@ class NaturalnessModel {
                 ngramSuccessor[`${sequence.elementList[index].key}`] = 0;
                 ngramSuccessor.cardinality = 0;
             }
-            ngramSuccessor[`${sequence.elementList[index].key}`]++;
-            ngramSuccessor.cardinality++;
+            let oldOccurence = ngramSuccessor[`${sequence.elementList[index].key}`]
+            if (isNaN(oldOccurence)) {
+                ngramSuccessor[`${sequence.elementList[index].key}`] = 1;
+            } else {
+                ngramSuccessor[`${sequence.elementList[index].key}`]++;
+            }
+            ngramSuccessor.cardinality = ngramSuccessor.cardinality + 1;
             this.ngramMap.set(ngram.key, ngramSuccessor);
         }
     }
 
     getProbability(ngram, element) {
-        let probability;
         let ngramSuccessor = this.ngramMap.get(ngram.key);
         if (ngramSuccessor === undefined) {
             return 0;
         }
         
         let elementModelProba = ngramSuccessor[`${element.key}`];
-        if (elementModelProba === undefined) {
+        if (elementModelProba === undefined || elementModelProba === null) {
             return 0;
         }
 
-        return probability = elementModelProba / ngramSuccessor.cardinality;;
+        let proba = elementModelProba / ngramSuccessor.cardinality;
+        return proba;
     }
 }
 

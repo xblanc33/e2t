@@ -2,7 +2,8 @@ const Ngram = require('./Ngram.js').Ngram;
 const Element = require('./Element.js').Element;
 
 class Sequence {
-    constructor(elementList) {
+    constructor(elementList, name) {
+        this.name = name;
         if (elementList === null || elementList === undefined) {
             this.elementList = [];
             this.length = 0;

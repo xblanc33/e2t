@@ -1,7 +1,7 @@
 const Sequence = require('./Sequence.js').Sequence;
 const NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
 
-const UPPER_BOUND = 40;
+const UPPER_BOUND = Infinity;
 
 class SequenceSuite {
     constructor(suite) {
@@ -40,7 +40,7 @@ class SequenceSuite {
             suiteCopy.splice(index, 1);
             suiteCopy.forEach(seq => model.learn(seq));
             let crossEntropy = model.crossEntropy(sequence);
-            if (crossEntropy < moreNatural.crossEntropy) {
+            if (crossEntropy <= moreNatural.crossEntropy) {
                 moreNatural.crossEntropy = crossEntropy;
                 moreNatural.sequence = sequence;
                 moreNatural.index = index;
@@ -54,6 +54,7 @@ class SequenceSuite {
 
         let rank = [];
         let moreNatural = this.getMoreNatural();
+        if (moreNatural.sequence === undefined) console.log('undefined!!!');
         rank.push({sequence:moreNatural.sequence, crossEntropy:moreNatural.crossEntropy});
         let suiteCopy = this.suite.slice(0);
         suiteCopy.splice(moreNatural.index, 1);

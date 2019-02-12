@@ -27,8 +27,9 @@ File actions.1.xml : Infinity
 20% are original (saturation is below 33%)
 ```
 
-The analysis states that only one logs is original. The 4 other ones are not original.
-It also states that the set of logs reaches saturation.
+The analysis states that only one log is original (actions.1.xml). The 4 other ones are not original !
+
+It also states that the set of logs reaches saturation (20%).
 
 ## Make your analysis
 

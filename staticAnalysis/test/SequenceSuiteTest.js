@@ -12,7 +12,7 @@ describe('SequenceSuite', function() {
           let sequenceSample = createSequence();
           let seqSuite = new SequenceSuite([sequenceSample.one, sequenceSample.two, sequenceSample.three], DEPTH, PROBA_OF_UNKNOWN);
           let res = seqSuite.getMoreNatural();
-          assert.equal(res.name, "one");
+          assert.equal(res.sequence.name, "one");
       });
     });
     describe('#rank()', () => {

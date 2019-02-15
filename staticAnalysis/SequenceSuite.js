@@ -31,7 +31,6 @@ class SequenceSuite {
         if (this.suite.length === 1) {
             return {
                 crossEntropy : UPPER_BOUND,
-                name : this.suite[0].name,
                 sequence : this.suite[0]
             }
         }
@@ -44,11 +43,10 @@ class SequenceSuite {
             suiteCopy.splice(index, 1);
             suiteCopy.forEach(seq => model.learn(seq));
             let crossEntropy = model.crossEntropy(sequence);
-            console.log(`crossEntropy ${sequence.name} = ${crossEntropy}`);
             if (crossEntropy <= moreNatural.crossEntropy) {
                 moreNatural.crossEntropy = crossEntropy;
                 moreNatural.sequence = sequence;
-                moreNatural.name = sequence.name;
+                moreNatural.index = index;
             }
         });
         return moreNatural;

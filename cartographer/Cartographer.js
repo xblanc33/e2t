@@ -1,9 +1,12 @@
 const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const amqp = require('amqplib');
-const EntropyCampaignManager = require('./EntropyCampaignManager');
 const PropertiesReader = require('properties-reader');
 const properties = PropertiesReader('e2t.properties');
+const NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
+const Event = require('./Event.js').Event;
+const Sequence = require('./Sequence.js').Sequence;
+
 
 const logger = winston.createLogger({
     level: 'info',
@@ -22,7 +25,7 @@ class Cartographer {
         this.rmqUrl = `amqp://${properties.path().rabbit.host}`;
         this.expeditionQueue = properties.path().rabbit.queue_name;
         
-        this.entropyCampaignManagerMap = new Map();
+        this.naturalnessModelMap = new Map();
     }
 
     async start() {
@@ -47,24 +50,25 @@ class Cartographer {
         let collection = this.mongoClient.db(this.dbName).collection('expedition');
         expedition._id = expedition.expeditionId;
         collection.insertOne(expedition).catch(ex => {
-            winston.error(`can't save expedition : ${ex}`);
+            logger.error(`can't save expedition : ${ex}`);
         });
 
-        let manager = this.entropyCampaignManagerMap.get(expedition.campaignId);
-        if (manager === undefined) {
+        let model = this.naturalnessModelMap.get(expedition.campaignId);
+        if (model === undefined) {
             try  {
-                manager = await this.createManager(expedition.campaignId);
-                this.entropyCampaignManagerMap.set(expedition.campaignId, manager);
+                model = await this.createModel(expedition.campaignId);
+                this.naturalnessModelMap.set(expedition.campaignId, model);
             } catch (ex) {
                 this.channel.nack(msg);
-                winston.error(`can't find campaign : ${ex}`);
+                logger.error(`can't find campaign : ${ex}`);
                 return;
             }
         }
 
-        let crossEntropy = manager.crossEntropy(expedition);
+        let sequence = extractSequence(expedition)
+        let crossEntropy = model.crossEntropy(sequence);
         logger.info(`CrossEntropy ${crossEntropy}`);
-        manager.updateModel(expedition);
+        model.learn(sequence);
         let entr = {
             value: crossEntropy,
             date: new Date(),
@@ -84,11 +88,13 @@ class Cartographer {
             })
     }
 
-    createManager(campaignId) {
+    createModel(campaignId) {
+        logger.info(`createModel : ${campaignId}`)
         return this.mongoClient.db(this.dbName)
             .collection('campaign')
             .findOne({_id: campaignId})
             .then ( campaign => {
+                logger.info(`campaign : ${JSON.stringify(campaign)}`)
                 if (campaign === undefined || campaign === null)  {
                     return Promise.reject(new Error('campaign not found'));
                 } else {
@@ -96,7 +102,8 @@ class Cartographer {
                 }
             })
             .then (campaign => {
-                return Promise.resolve(new EntropyCampaignManager(campaign));
+                logger.info(`campaign : ${JSON.stringify(campaign)}`)
+                return Promise.resolve(new NaturalnessModel(campaign.path, campaign.probaOfUnknown));
             });
     }
 
@@ -153,4 +160,13 @@ async function createRabbitChannelAndCreateQueue(rmqUrl, queueList) {
     }
     logger.info("Successfully connected to RabbitMQ");
     return channel;
+}
+
+function extractSequence(expedition) {
+    logger.info(`extractSequence:${expedition}`)
+    let eventList = expedition.events.map(event => {
+        let eventValue = event.type + event.selector + event.value;
+        return new Event(eventValue);
+    });
+    return new Sequence(eventList);
 }

@@ -1,25 +1,25 @@
 const assert = require('chai').assert;
 const Sequence = require('../Sequence.js').Sequence;
-const Element = require('../Element.js').Element;
+const Event = require('../Event.js').Event;
 
 describe('Sequence', function() {
   describe('#constructor()', function() {
     it('should create an empty sequence', () => {
         let seq = new Sequence();
         assert.equal(seq.length, 0);
-        assert.isTrue(Array.isArray(seq.elementList));
-        assert.equal(seq.elementList.length, 0);
+        assert.isTrue(Array.isArray(seq.eventList));
+        assert.equal(seq.eventList.length, 0);
     });
-    it('should create a sequence of elements', () => {
-        let e = new Element('hey');
+    it('should create a sequence of events', () => {
+        let e = new Event('hey');
         let seq = new Sequence([e,e,e]);     
         assert.equal(seq.length, 3);
-        assert.isTrue(Array.isArray(seq.elementList));
-        assert.equal(seq.elementList.length, 3);
+        assert.isTrue(Array.isArray(seq.eventList));
+        assert.equal(seq.eventList.length, 3);
     });
   });
   describe('#append()', function() {
-    it('should throw an exception with undefined element', () => {
+    it('should throw an exception with undefined event', () => {
         try  {
             let seq = new Sequence(undefined);
             seq.append();
@@ -37,7 +37,7 @@ describe('Sequence', function() {
 
         }
     });
-    it('should throw an exception with not an Element', () => {
+    it('should throw an exception with not an Event', () => {
         try  {
             let seq = new Sequence(null);
             seq.append('hey');
@@ -55,7 +55,7 @@ describe('Sequence', function() {
     });
     it('should return 1 Ngram', () => {
         let seq = new Sequence();
-        let e = new Element('test')
+        let e = new Event('test')
         seq.append(e);
         seq.append(e);
         let ng = seq.getNgram(1,1);

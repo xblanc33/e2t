@@ -1,4 +1,4 @@
-class Element {
+class Event {
     constructor(value) {
         if (value === null || value === undefined) {
             throw 'Cannot create Element with null or undefined';
@@ -20,4 +20,4 @@ function hashCode(s) {
     return hash;
 }
 
-module.exports.Element = Element;
+module.exports.Event = Event;

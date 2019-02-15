@@ -1,21 +1,21 @@
-const Element = require('./Element.js').Element;
+const Event = require('./Event.js').Event;
 
 class Ngram {
-    constructor(elementList) {
-        if (elementList === null || elementList === undefined) {
-            throw 'Cannot create Ngram with null or undefined elementList';
+    constructor(eventList) {
+        if (eventList === null || eventList === undefined) {
+            throw 'Cannot create Ngram with null or undefined eventList';
         }
-        if (!Array.isArray(elementList)) {
-            throw 'Cannot create Ngram with isArray(elementList) false';
+        if (!Array.isArray(eventList)) {
+            throw 'Cannot create Ngram with isArray(eventList) false';
         }
-        elementList.forEach(element => {
-            if (!(element instanceof Element)) {
-                throw 'Cannot create Ngram, one element is not an Element';
+        eventList.forEach(event => {
+            if (!(event instanceof Event)) {
+                throw 'Cannot create Ngram, one event is not an Event';
             }
         })
-        this.elementList = elementList;
-        this.size = elementList.lenght;
-        this.key = elementList.map(el => el.key).reduce((accu,cur)=>accu+cur, '');
+        this.eventList = eventList;
+        this.size = eventList.lenght;
+        this.key = eventList.map(el => el.key).reduce((accu,cur)=>accu+cur, '');
     }
 }
 

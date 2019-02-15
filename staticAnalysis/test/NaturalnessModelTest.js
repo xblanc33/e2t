@@ -1,9 +1,9 @@
 const assert = require('chai').assert;
 const NaturalnessModel = require('../NaturalnessModel.js').NaturalnessModel;
-const Element = require('../Element.js').Element;
+const Event = require('../Event.js').Event;
 const Sequence = require('../Sequence.js').Sequence;
 
-describe('Element', function() {
+describe('NaturalnessModel', function() {
     describe('#learn()', () => {
         it('should add 5 Ngram to the map', () => {
           let sequenceSample = createSequence();
@@ -59,12 +59,12 @@ describe('Element', function() {
 
 
 function createSequence() {
-    let a = new Element('a');
-    let b = new Element('b');
-    let c = new Element('c');
-    let d = new Element('d');
-    let e = new Element('e');
-    let f = new Element('f');
+    let a = new Event('a');
+    let b = new Event('b');
+    let c = new Event('c');
+    let d = new Event('d');
+    let e = new Event('e');
+    let f = new Event('f');
     
     return {
         one : new Sequence([a,b,c,d,e]),

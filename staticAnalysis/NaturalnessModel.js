@@ -12,10 +12,10 @@ class NaturalnessModel {
 
     crossEntropy(sequence) {
         checkSequenceType(sequence);
-        if (sequence.elementList.length === 0) return this.probaOfUnknown;
+        if (sequence.eventList.length === 0) return this.probaOfUnknown;
         let probabilitySum = 0;
-        for (let index = 0; index < sequence.elementList.length; index++) {
-            let currentElement = sequence.elementList[index];
+        for (let index = 0; index < sequence.eventList.length; index++) {
+            let currentElement = sequence.eventList[index];
             let currentNgram = sequence.getNgram(index, this.depth);
             let modelProba = this.getProbability(currentNgram, currentElement);
             let proba;
@@ -26,24 +26,24 @@ class NaturalnessModel {
             }
             probabilitySum = probabilitySum + Math.log2(proba);
         }
-        return -(probabilitySum / sequence.elementList.length);
+        return -(probabilitySum / sequence.eventList.length);
     }
 
     learn(sequence) {
         checkSequenceType(sequence);
-        for (let index = 0; index < sequence.elementList.length; index++) {
+        for (let index = 0; index < sequence.eventList.length; index++) {
             let ngram = sequence.getNgram(index,this.depth);
             let ngramSuccessor = this.ngramMap.get(ngram.key);
             if (ngramSuccessor === undefined) {
                 ngramSuccessor = {};
-                ngramSuccessor[`${sequence.elementList[index].key}`] = 0;
+                ngramSuccessor[`${sequence.eventList[index].key}`] = 0;
                 ngramSuccessor.cardinality = 0;
             }
-            let oldOccurence = ngramSuccessor[`${sequence.elementList[index].key}`]
+            let oldOccurence = ngramSuccessor[`${sequence.eventList[index].key}`]
             if (isNaN(oldOccurence)) {
-                ngramSuccessor[`${sequence.elementList[index].key}`] = 1;
+                ngramSuccessor[`${sequence.eventList[index].key}`] = 1;
             } else {
-                ngramSuccessor[`${sequence.elementList[index].key}`]++;
+                ngramSuccessor[`${sequence.eventList[index].key}`]++;
             }
             ngramSuccessor.cardinality = ngramSuccessor.cardinality + 1;
             this.ngramMap.set(ngram.key, ngramSuccessor);
@@ -63,6 +63,10 @@ class NaturalnessModel {
 
         let proba = elementModelProba / ngramSuccessor.cardinality;
         return proba;
+    }
+
+    getKnownProbability(ngram) {
+        
     }
 }
 

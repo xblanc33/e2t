@@ -1,10 +1,14 @@
 const Sequence = require('./Sequence.js').Sequence;
 const NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
 
-const UPPER_BOUND = Infinity;
+const DEPTH = 4;
+const PROBA_OF_UNKNOWN = 0;//0.000001;
+const UPPER_BOUND = -Math.log2(PROBA_OF_UNKNOWN);
 
 class SequenceSuite {
-    constructor(suite) {
+    constructor(suite, depth, probaOfUnknown) {
+        this.depth = depth || DEPTH;
+        this.probaOfUnknown = probaOfUnknown || PROBA_OF_UNKNOWN;
         if (suite === null || suite === undefined) {
             throw 'cannot create SequenceSuite with no suite';
         }
@@ -27,7 +31,7 @@ class SequenceSuite {
         if (this.suite.length === 1) {
             return {
                 crossEntropy : UPPER_BOUND,
-                index : 0,
+                name : this.suite[0].name,
                 sequence : this.suite[0]
             }
         }
@@ -35,15 +39,16 @@ class SequenceSuite {
             crossEntropy : UPPER_BOUND
         }
         this.suite.forEach( (sequence, index) => {
-            let model = new NaturalnessModel();
+            let model = new NaturalnessModel(this.depth, this.probaOfUnknown);
             let suiteCopy = this.suite.slice(0);
             suiteCopy.splice(index, 1);
             suiteCopy.forEach(seq => model.learn(seq));
             let crossEntropy = model.crossEntropy(sequence);
+            console.log(`crossEntropy ${sequence.name} = ${crossEntropy}`);
             if (crossEntropy <= moreNatural.crossEntropy) {
                 moreNatural.crossEntropy = crossEntropy;
                 moreNatural.sequence = sequence;
-                moreNatural.index = index;
+                moreNatural.name = sequence.name;
             }
         });
         return moreNatural;
@@ -58,7 +63,7 @@ class SequenceSuite {
         rank.push({sequence:moreNatural.sequence, crossEntropy:moreNatural.crossEntropy});
         let suiteCopy = this.suite.slice(0);
         suiteCopy.splice(moreNatural.index, 1);
-        let other = new SequenceSuite(suiteCopy);
+        let other = new SequenceSuite(suiteCopy, this.depth, this.probaOfUnknown);
         rank.push(...other.rank());
         return rank;
     }

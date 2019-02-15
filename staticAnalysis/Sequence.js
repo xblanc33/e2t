@@ -1,46 +1,46 @@
 const Ngram = require('./Ngram.js').Ngram;
-const Element = require('./Element.js').Element;
+const Event = require('./Event.js').Event;
 
 class Sequence {
-    constructor(elementList, name) {
+    constructor(eventList, name) {
         this.name = name;
-        if (elementList === null || elementList === undefined) {
-            this.elementList = [];
+        if (eventList === null || eventList === undefined) {
+            this.eventList = [];
             this.length = 0;
         } else {
-            if (! Array.isArray(elementList)) {
-                throw 'Cannot create sequence with Array.isArray(elementList) === false';
+            if (! Array.isArray(eventList)) {
+                throw 'Cannot create sequence with Array.isArray(eventList) === false';
             }
-            elementList.forEach(element => {
-                if (!(element instanceof Element)) {
-                    throw 'Cannot create sequence with array containing a not Element'
+            eventList.forEach(event => {
+                if (!(event instanceof Event)) {
+                    throw 'Cannot create sequence with array containing a not Event'
                 }
             })
-            this.elementList = elementList;
-            this.length = elementList.length;
+            this.eventList = eventList;
+            this.length = eventList.length;
         }
     }
 
-    append(element) {
-        if (element == null || element == undefined) {
+    append(event) {
+        if (event == null || event == undefined) {
             throw 'cannot append null or undefined';
         }
-        if (!(element instanceof Element)) {
-            throw 'cannot append element not Element';
+        if (!(event instanceof Event)) {
+            throw 'cannot append event not Event';
         }
-        this.elementList.push(element);
+        this.eventList.push(event);
         this.length++;
     }
 
     getNgram(beforeIndex, ngramSize) {
-        let ngramElementList = [];
+        let ngrameventList = [];
         if (beforeIndex > 0) {
             let from = Math.max(0,beforeIndex - ngramSize);
             for (let previousIndex = from; previousIndex < beforeIndex; previousIndex++) {
-                ngramElementList.push(this.elementList[previousIndex]);
+                ngrameventList.push(this.eventList[previousIndex]);
             }
         }
-        return new Ngram(ngramElementList);
+        return new Ngram(ngrameventList);
     }
 }
 

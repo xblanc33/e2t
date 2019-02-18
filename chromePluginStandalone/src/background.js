@@ -1,6 +1,6 @@
-let NaturalnessModel = require ('./NaturalnessModel.js').NaturalnessModel;
-let Event = require ('./Event.js').Event;
-let Sequence = require ('./Sequence.js').Sequence;
+let NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
+let Event = require('./Event.js').Event;
+let Sequence = require('./Sequence.js').Sequence;
 let NavigationListener = require('./NavigationListener');
 
 const DEPTH = 4;
@@ -45,17 +45,41 @@ class Background {
                 return true;
 
             case 'addEventToExpedition':
-                chrome.extension.getBackgroundPage().console.log(`Add event : ${msg.event.type}`);
                 if (this.state.isRecording && this.state.expedition.events) {
                     this.state.expedition.events.push(msg.event);
                     if (this.state.expedition.events.length > DEPTH) {
                         let sequence = extractSequence(this.state.expedition);
-                        console.log(`crossEntropy : ${this.state.naturalnessModel.crossEntropy(sequence)}`)
                         this.state.naturalnessModel.learn(sequence);
                         this.state.expedition.events.shift();
                     }
                 }
-                return false;  //TODO sendReponse raise an "Attempting to use a disconnected port object" error. Probably because the onPageListener tab (??) doesn't exist anymore
+                return false; //TODO sendReponse raise an "Attempting to use a disconnected port object" error. Probably because the onPageListener tab (??) doesn't exist anymore
+
+            case 'getProbabilities':
+                if (this.state.expedition.events.length < DEPTH) {
+                    sendResponse(null)
+                    return
+                }
+                chrome.extension.getBackgroundPage().console.log(this.state.expedition.events);
+
+                const events = msg.events
+
+                const probabilities = events.map(event => {
+                    const expedition_events = this.state.expedition.events.slice()
+                    expedition_events.push(event)
+
+                    const sequence = extractSequence({
+                        events: expedition_events
+                    })
+
+                    return {
+                        selector: event.selector,
+                        probability: this.state.naturalnessModel.crossEntropy(sequence)
+                    }
+                })
+                sendResponse({
+                    probabilities
+                })
         }
     }
 }

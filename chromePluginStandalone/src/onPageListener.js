@@ -67,14 +67,14 @@ function applyClickProbabilityMask(elements) {
         kind: 'getProbabilities',
         events
     }, response => {
-        if (!response) {
-            return
+        console.log(response)
+        if (response && response.probabilities) {
+            response.probabilities.forEach(probability_per_selector => {
+                const element = document.querySelector(probability_per_selector.selector)
+                const value = (probability_per_selector.probability / 20) * 255
+                element.style["background-color"] = 'rgb(' + value + ', 76, 76)';
+            })
         }
-        response.probabilities_per_selector.forEach(probability_per_selector => {
-            const element = document.querySelector(probability_per_selector.selector)
-            const value = (probability_per_selector.probability / 20) * 255
-            element.style["background-color"] = 'rgb(' + value + ', 76, 76)';
-        })
     });
 
 }

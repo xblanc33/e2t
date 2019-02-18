@@ -61,17 +61,13 @@ class Background {
                     return
                 }
                 chrome.extension.getBackgroundPage().console.log(this.state.expedition.events);
-
-                const events = msg.events
-
-                const probabilities = events.map(event => {
+                const probabilities = msg.events.map(event => {
                     const expedition_events = this.state.expedition.events.slice()
                     expedition_events.push(event)
 
                     const sequence = extractSequence({
                         events: expedition_events
                     })
-
                     return {
                         selector: event.selector,
                         probability: this.state.naturalnessModel.crossEntropy(sequence)

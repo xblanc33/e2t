@@ -34,8 +34,6 @@ function attach() {
     };
 
     const all = document.querySelectorAll('*');
-    applyClickProbabilityMask(all)
-
     all.forEach(
         element => {
             observer.observe(element, config);
@@ -50,33 +48,33 @@ function attach() {
     );
 
     window.addEventListener('click', handleClick, true);
-
-    window.addEventListener('mousedown', handleMouseDown, true);
-
+    window.addEventListener('click', applyClickProbabilityMask, true);
+    //window.addEventListener('mousedown', handleMouseDown, true);
     document.body.addEventListener('submit', handleSubmit, true);
 }
 
-function applyClickProbabilityMask(elements) {
-    const events = []
+function applyClickProbabilityMask() {
+    const elements = document.querySelectorAll('*');
+
+    const events = [];
     elements.forEach(element => events.push({
         type: 'click',
         selector: computeSelector(element),
         value: 'click'
-    }))
+    }));
+
     chrome.runtime.sendMessage({
         kind: 'getProbabilities',
         events
     }, response => {
-        console.log(response)
         if (response && response.probabilities) {
             response.probabilities.forEach(probability_per_selector => {
-                const element = document.querySelector(probability_per_selector.selector)
-                const value = (probability_per_selector.probability / 20) * 255
+                const element = document.querySelector(probability_per_selector.selector);
+                const value = (probability_per_selector.probability / 20) * 255;
                 element.style["background-color"] = 'rgb(' + value + ', 76, 76)';
-            })
+            });
         }
     });
-
 }
 
 function handleInput(e) {
@@ -100,16 +98,15 @@ function handleMutation(mutations) {
                             input => {
                                 input.addEventListener('input', handleInput);
                             }
-                        )
+                        );
                     }
                 }
-            )
+            );
         }
     });
 }
 
 function handleChange(e) {
-    element.value
     if (e.type === 'change') {
         const type = e.type;
         const selector = computeSelector(e.target);
@@ -154,6 +151,7 @@ function handleSubmit(e) {
 }
 
 function handleEvent(type, selector, value) {
+    console.log(type);
     if (isEmpty(type)) return undefined;
     if (isEmpty(selector)) return undefined;
     if (isEmpty(value)) return undefined;

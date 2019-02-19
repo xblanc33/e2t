@@ -1,7 +1,6 @@
-
 class NavigationListener {
 
-    constructor(){
+    constructor() {
         this.window = null;
         this.tab = null;
 
@@ -13,26 +12,36 @@ class NavigationListener {
         //this.addBrowserListeners();
     }
 
-    startExpedition(state){
-        let promise = new Promise( (res, rej) => {
-            chrome.windows.get(state.windowId, {populate:true}, window => {
+    startExpedition(state) {
+        let promise = new Promise((res, rej) => {
+            chrome.windows.get(state.windowId, {
+                populate: true
+            }, window => {
                 if (window === null || window === undefined) rej();
                 this.window = window;
-                this.tab = window.tabs.find( tab => {return tab.active;});
-                chrome.tabs.reload(this.tab.id, {bypassCache: true}, () => {
+                this.tab = window.tabs.find(tab => {
+                    return tab.active;
+                });
+                chrome.tabs.reload(this.tab.id, {
+                    bypassCache: true
+                }, () => {
                     res();
                 });
             });
         });
         return promise;
     }
-    
-    webNavigationCompleted({tabId, frameId}) {
-        if (this.tab && (this.tab.id === tabId  ))  {
+
+    webNavigationCompleted({
+        tabId,
+        frameId
+    }) {
+        if (this.tab && (this.tab.id === tabId)) {
             if (frameId == 0) {
                 chrome.tabs.executeScript(
-                    this.tab.id,
-                    {file: 'listener.js'},
+                    this.tab.id, {
+                        file: 'listener.js'
+                    },
                     result => {
                         if (result === undefined) {
                             chrome.extension.getBackgroundPage().console.log('cannot load listener.js');
@@ -42,7 +51,7 @@ class NavigationListener {
                     }
                 );
             }
-        }        
+        }
     }
 }
 

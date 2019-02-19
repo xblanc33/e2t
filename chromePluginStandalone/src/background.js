@@ -1,6 +1,6 @@
-let NaturalnessModel = require ('./NaturalnessModel.js').NaturalnessModel;
-let Event = require ('./Event.js').Event;
-let Sequence = require ('./Sequence.js').Sequence;
+let NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
+let Event = require('./Event.js').Event;
+let Sequence = require('./Sequence.js').Sequence;
 let NavigationListener = require('./NavigationListener');
 
 const DEPTH = 4;
@@ -45,17 +45,48 @@ class Background {
                 return true;
 
             case 'addEventToExpedition':
-                chrome.extension.getBackgroundPage().console.log(`Add event : ${msg.event.type}`);
                 if (this.state.isRecording && this.state.expedition.events) {
                     this.state.expedition.events.push(msg.event);
+
                     if (this.state.expedition.events.length > DEPTH) {
                         let sequence = extractSequence(this.state.expedition);
-                        console.log(`crossEntropy : ${this.state.naturalnessModel.crossEntropy(sequence)}`)
                         this.state.naturalnessModel.learn(sequence);
                         this.state.expedition.events.shift();
                     }
                 }
-                return false;  //TODO sendReponse raise an "Attempting to use a disconnected port object" error. Probably because the onPageListener tab (??) doesn't exist anymore
+                return false; //TODO sendReponse raise an "Attempting to use a disconnected port object" error. Probably because the onPageListener tab (??) doesn't exist anymore
+
+            case 'getProbabilities':
+                console.log('getProbabilities');
+                if (this.state.expedition.events.length < DEPTH) {
+                    sendResponse(null);
+                    return true;
+                }
+                var probabilities = msg.events.map(event => {
+                    const events = this.state.expedition.events.slice();
+                    events.push(event);
+
+                    const sequence = extractSequence({
+                        events
+                    });
+                    const entropy = this.state.naturalnessModel.crossEntropy(sequence);
+                    return {
+                        selector: event.selector,
+                        probability: entropy
+                    };
+                });
+                var registered_probabilities = [];
+
+                probabilities.forEach(prob => {
+                    if (!registered_probabilities.some(registered => registered.probability === prob.probability)) {
+                        registered_probabilities.push(prob);
+                    }
+                });
+                console.log(registered_probabilities);
+
+                sendResponse({
+                    probabilities
+                });
         }
     }
 }

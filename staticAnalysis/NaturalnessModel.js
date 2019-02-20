@@ -1,5 +1,6 @@
 const Sequence = require('./Sequence.js').Sequence;
 const NgramSuccessorModel = require('./NgramSuccessorModel.js').NgramSuccessorModel
+const Ngram = require('./Ngram.js').Ngram;
 
 const PROBA_OF_UNKNOWN = 0; //0.000001;
 const DEPTH = 3;

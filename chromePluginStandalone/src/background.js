@@ -1,9 +1,10 @@
 let NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
 let Event = require('./Event.js').Event;
 let Sequence = require('./Sequence.js').Sequence;
+let Ngram = require('./Ngram.js').Ngram;
 let NavigationListener = require('./NavigationListener');
 
-const DEPTH = 4;
+const DEPTH = 2;
 const PROBA_OF_UNKNOWN = 0.000001;
 
 class Background {
@@ -45,44 +46,47 @@ class Background {
                 return true;
 
             case 'addEventToExpedition':
+                //console.log('addEventToExpedition');
                 if (this.state.isRecording && this.state.expedition.events) {
                     this.state.expedition.events.push(msg.event);
+                    let sequence = extractSequence(this.state.expedition);
+                    this.state.naturalnessModel.learn(sequence);
+                    //console.log(`learn:${JSON.stringify(sequence)}`);
 
-                    if (this.state.expedition.events.length > DEPTH) {
-                        let sequence = extractSequence(this.state.expedition);
-                        this.state.naturalnessModel.learn(sequence);
+                    if (this.state.expedition.events.length >= DEPTH) {    
+                        //console.log('shift');
                         this.state.expedition.events.shift();
                     }
                 }
                 return false; //TODO sendReponse raise an "Attempting to use a disconnected port object" error. Probably because the onPageListener tab (??) doesn't exist anymore
 
             case 'getProbabilities':
-                console.log('getProbabilities');
-                if (this.state.expedition.events.length < DEPTH) {
-                    sendResponse(null);
-                    return true;
-                }
+                //console.log('getProbabilities');
+                let eventList = this.state.expedition.events.map(event => {
+                    let eventValue = event.type + event.selector + event.value;
+                    return new Event(eventValue);
+                });
+                let ngram = new Ngram(eventList);
+                //console.log('ngram');
+                //console.log(JSON.stringify(ngram));
+                let successorModel = this.state.naturalnessModel.getNgramSuccessorModel(ngram);
+                //console.log('successorModel');
+                //console.log(JSON.stringify(successorModel));
                 var probabilities = msg.events.map(event => {
-                    const events = this.state.expedition.events.slice();
-                    events.push(event);
-
-                    const sequence = extractSequence({
-                        events
-                    });
-                    const entropy = this.state.naturalnessModel.crossEntropy(sequence);
+                    let proba = 0;
+                    if (successorModel != undefined) {
+                        proba = successorModel.getProbability(new Event(event.type + event.selector + event.value));
+                        //console.log('successModel:'+proba);
+                    }
                     return {
                         selector: event.selector,
-                        probability: entropy
+                        probability: proba
                     };
                 });
-                var registered_probabilities = [];
+                //console.log(probabilities);
 
-                probabilities.forEach(prob => {
-                    if (!registered_probabilities.some(registered => registered.probability === prob.probability)) {
-                        registered_probabilities.push(prob);
-                    }
-                });
-                console.log(registered_probabilities);
+                let knownProba = probabilities.filter(prob => prob.probability > 0);
+                //console.log(knownProba);
 
                 sendResponse({
                     probabilities

@@ -86,7 +86,7 @@ class Background {
                 //console.log(probabilities);
 
                 let knownProba = probabilities.filter(prob => prob.probability > 0);
-                //console.log(knownProba);
+                console.log(knownProba);
 
                 sendResponse({
                     probabilities

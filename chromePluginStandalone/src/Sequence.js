@@ -8,14 +8,14 @@ class Sequence {
             this.eventList = [];
             this.length = 0;
         } else {
-            if (!Array.isArray(eventList)) {
+            if (! Array.isArray(eventList)) {
                 throw 'Cannot create sequence with Array.isArray(eventList) === false';
             }
             eventList.forEach(event => {
                 if (!(event instanceof Event)) {
-                    throw 'Cannot create sequence with array containing a not Event';
+                    throw 'Cannot create sequence with array containing a not Event'
                 }
-            });
+            })
             this.eventList = eventList;
             this.length = eventList.length;
         }
@@ -35,16 +35,12 @@ class Sequence {
     getNgram(beforeIndex, ngramSize) {
         let ngrameventList = [];
         if (beforeIndex > 0) {
-            let from = Math.max(0, beforeIndex - ngramSize);
+            let from = Math.max(0,beforeIndex - ngramSize);
             for (let previousIndex = from; previousIndex < beforeIndex; previousIndex++) {
                 ngrameventList.push(this.eventList[previousIndex]);
             }
         }
         return new Ngram(ngrameventList);
-    }
-
-    toString() {
-        return this.eventList.map(e => e.toString()).join(' ---- ');
     }
 }
 

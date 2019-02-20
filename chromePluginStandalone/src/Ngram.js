@@ -12,10 +12,10 @@ class Ngram {
             if (!(event instanceof Event)) {
                 throw 'Cannot create Ngram, one event is not an Event';
             }
-        });
+        })
         this.eventList = eventList;
         this.size = eventList.lenght;
-        this.key = eventList.map(el => el.key).reduce((accu, cur) => accu + cur, '');
+        this.key = eventList.map(el => el.key).reduce((accu,cur)=>accu+cur, '');
     }
 }
 

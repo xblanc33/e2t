@@ -20,13 +20,13 @@ describe('NaturalnessModel', function () {
         });
     });
     describe('#crossEntropy()', () => {
-        it('should compute crossEntropy with all right', () => {
+        it('should compute unknown proba crossEntropy with empty seq', () => {
             let model = new NaturalnessModel();
             let emptySeq = new Sequence();
             let crossEnt = model.crossEntropy(emptySeq);
             assert.equal(crossEnt, model.probaOfUnknown);
         });
-        it('should compute crossEntropy with all right', () => {
+        it('should compute crossEntropy with all right (sample1)', () => {
             let model = new NaturalnessModel();
             let sequenceSample = createSequence();
             model.learn(sequenceSample.one);
@@ -35,7 +35,7 @@ describe('NaturalnessModel', function () {
             let expected = -(5 * Math.log2(right)) / 5;
             assert.equal(crossEnt, expected);
         });
-        it('should compute crossEntropy with one wrong', () => {
+        it('should compute crossEntropy with one wrong (sample1 && sample2)', () => {
             let model = new NaturalnessModel();
             let sequenceSample = createSequence();
             model.learn(sequenceSample.one);
@@ -45,7 +45,7 @@ describe('NaturalnessModel', function () {
             let expected = -(4 * Math.log2(right) + Math.log2(wrong)) / 5;
             assert.equal(crossEnt, expected);
         });
-        it('should compute crossEntropy with all wrong', () => {
+        it('should compute crossEntropy with all wrong (sample1 && sample3)', () => {
             let model = new NaturalnessModel();
             let sequenceSample = createSequence();
             model.learn(sequenceSample.one);

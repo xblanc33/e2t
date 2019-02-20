@@ -7,12 +7,7 @@ class NgramSuccessorModel {
     }
 
     getProbability(event) {
-        if (event == null || event == undefined) {
-            throw 'cannot learn null or undefined';
-        }
-        if (!(event instanceof Event)) {
-            throw 'cannot learn event not Event';
-        }
+        checkType(event);
 
         let successor = this.successorMap.get(event.key)
         if (successor == undefined)  {
@@ -23,12 +18,7 @@ class NgramSuccessorModel {
     }
 
     learn(event) {
-        if (event == null || event == undefined) {
-            throw 'cannot learn null or undefined';
-        }
-        if (!(event instanceof Event)) {
-            throw 'cannot learn event not Event';
-        }
+        checkType(event);
 
         let successor = this.successorMap.get(event.key);
         if (successor == undefined) {
@@ -43,6 +33,15 @@ class NgramSuccessorModel {
         this.successorMap.set(event.key, successor);
     }
 
+}
+
+function checkType(event) {
+    if (event == null || event == undefined) {
+        throw 'cannot learn null or undefined';
+    }
+    if (!(event instanceof Event)) {
+        throw 'cannot learn event not Event';
+    }
 }
 
 module.exports.NgramSuccessorModel = NgramSuccessorModel;

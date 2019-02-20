@@ -1,4 +1,5 @@
 const Sequence = require('./Sequence.js').Sequence;
+const NgramSuccessorModel = require('./NgramSuccessorModel.js').NgramSuccessorModel
 
 const PROBA_OF_UNKNOWN = 0; //0.000001;
 const DEPTH = 3;
@@ -15,9 +16,9 @@ class NaturalnessModel {
         if (sequence.eventList.length === 0) return this.probaOfUnknown;
         let probabilitySum = 0;
         for (let index = 0; index < sequence.eventList.length; index++) {
-            let currentEvent = sequence.eventList[index];
+            let currentElement = sequence.eventList[index];
             let currentNgram = sequence.getNgram(index, this.depth);
-            let modelProba = this.getProbability(currentNgram, currentEvent);
+            let modelProba = this.getProbability(currentNgram, currentElement);
             let proba;
             if (modelProba === 0) {
                 proba = this.probaOfUnknown;
@@ -35,39 +36,15 @@ class NaturalnessModel {
             let ngram = sequence.getNgram(index, this.depth);
             let ngramSuccessor = this.ngramMap.get(ngram.key);
             if (ngramSuccessor === undefined) {
-                ngramSuccessor = {};
-                ngramSuccessor[`${sequence.eventList[index].key}`] = 0;
-                ngramSuccessor.cardinality = 0;
+                ngramSuccessor = new NgramSuccessorModel();
+                this.ngramMap.set(ngram.key, ngramSuccessor);           
             }
-            let oldOccurence = ngramSuccessor[`${sequence.eventList[index].key}`];
-            if (isNaN(oldOccurence)) {
-                ngramSuccessor[`${sequence.eventList[index].key}`] = 1;
-            } else {
-                ngramSuccessor[`${sequence.eventList[index].key}`]++;
-            }
-            ngramSuccessor.cardinality = ngramSuccessor.cardinality + 1;
-            this.ngramMap.set(ngram.key, ngramSuccessor);
+            ngramSuccessor.learn(sequence.eventList[index]);
         }
     }
 
-    getProbability(ngram, element) {
-        let ngramSuccessor = this.ngramMap.get(ngram.key);
-        if (ngramSuccessor === undefined) {
-            return 0;
-        }
-
-        let elementModelProba = ngramSuccessor[`${element.key}`];
-        if (elementModelProba === undefined || elementModelProba === null) {
-            return 0;
-        }
-
-        let proba = elementModelProba / ngramSuccessor.cardinality;
-        return proba;
-    }
-
-    getKnownProbability(ngram) {
+    getNgramSuccessorModel(ngram) {
         return this.ngramMap.get(ngram.key);
-
     }
 }
 

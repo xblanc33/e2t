@@ -15,9 +15,9 @@ class NaturalnessModel {
         if (sequence.eventList.length === 0) return this.probaOfUnknown;
         let probabilitySum = 0;
         for (let index = 0; index < sequence.eventList.length; index++) {
-            let currentElement = sequence.eventList[index];
+            let currentEvent = sequence.eventList[index];
             let currentNgram = sequence.getNgram(index, this.depth);
-            let modelProba = this.getProbability(currentNgram, currentElement);
+            let modelProba = this.getProbability(currentNgram, currentEvent);
             let proba;
             if (modelProba === 0) {
                 proba = this.probaOfUnknown;
@@ -66,6 +66,7 @@ class NaturalnessModel {
     }
 
     getKnownProbability(ngram) {
+        return this.ngramMap.get(ngram.key);
 
     }
 }

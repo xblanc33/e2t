@@ -13,6 +13,7 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
+    "naturalness": "^1.0.0",
     "xml2js": "^0.4.19"
   }
 }

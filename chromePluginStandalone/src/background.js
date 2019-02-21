@@ -1,7 +1,8 @@
-let NaturalnessModel = require('../../staticAnalysis/NaturalnessModel.js').NaturalnessModel;
-let Event = require('../../staticAnalysis/Event.js').Event;
-let Sequence = require('../../staticAnalysis/Sequence.js').Sequence;
-let Ngram = require('../../staticAnalysis/Ngram').Ngram;
+const naturalness = require('naturalness');
+let NaturalnessModel = naturalness.NaturalnessModel;
+let Event = naturalness.Event;
+let Sequence = naturalness.Sequence;
+let Ngram = naturalness.Ngram;
 let NavigationListener = require('./NavigationListener');
 
 const DEPTH = 2;

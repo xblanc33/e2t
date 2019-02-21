@@ -1,15 +1,16 @@
 const fs = require('fs');
 const xml2js = require('xml2js');
 
-const Event = require('./Event.js').Event;
-const Sequence = require('./Sequence.js').Sequence;
-const SequenceSuite = require('./SequenceSuite.js').SequenceSuite;
+const naturalness = require('naturalness');
+const Event = naturalness.Event;
+const Sequence = naturalness.Sequence;
+const SequenceSuite = naturalness.SequenceSuite;
 
 var parser = new xml2js.Parser();
 var suite = [];
 var directory = process.argv[2] || (__dirname + '/ats');
 
-const DEPTH = 0;
+const DEPTH = 20;
 //const PROBA_OF_UNKNOWN = 0.000001;
 const PROBA_OF_UNKNOWN = 0;
 

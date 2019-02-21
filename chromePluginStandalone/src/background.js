@@ -48,12 +48,12 @@ class Background {
             case 'addEventToExpedition':
                 //console.log('addEventToExpedition');
                 if (this.state.isRecording && this.state.expedition.events) {
-                    this.state.expedition.events.push(msg.event);
+                    this.state.expedition.events.push(msg.event); //DEPTH+1
                     let sequence = extractSequence(this.state.expedition);
                     this.state.naturalnessModel.learn(sequence);
                     //console.log(`learn:${JSON.stringify(sequence)}`);
 
-                    if (this.state.expedition.events.length >= DEPTH) {    
+                    if (this.state.expedition.events.length == (DEPTH+1)) {    
                         //console.log('shift');
                         this.state.expedition.events.shift();
                     }

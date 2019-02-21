@@ -1,19 +1,4 @@
 import CssSelectGenerator from 'css-selector-generator';
-//import {record} from 'rrweb';
-
-/*record({
-    emit(event) {
-        chrome.runtime.sendMessage({
-            kind:'addEventToExpedition',
-            event: {
-                type: 'rrweb',
-                selector: 'rrweb',
-                value: JSON.stringify(event)
-            }
-        });
-    },
-  });*/
-
 
 attach();
 
@@ -48,9 +33,10 @@ function attach() {
     );
 
     window.addEventListener('click', handleClick, true);
-    window.addEventListener('click', applyClickProbabilityMask, true);
     //window.addEventListener('mousedown', handleMouseDown, true);
     document.body.addEventListener('submit', handleSubmit, true);
+
+    applyClickProbabilityMask();
 }
 
 function applyClickProbabilityMask() {
@@ -66,12 +52,17 @@ function applyClickProbabilityMask() {
     chrome.runtime.sendMessage({
         kind: 'getProbabilities',
         events
-    }, response => {
+    }, 
+    {}, 
+    response => {
         if (response && response.probabilities) {
-            response.probabilities.forEach(probability_per_selector => {
+            response.probabilities.filter(element => element.probability > 0).forEach(probability_per_selector => {
+                console.log(probability_per_selector.probability)
                 const element = document.querySelector(probability_per_selector.selector);
                 const value = (probability_per_selector.probability / 20) * 255;
-                element.style["background-color"] = 'rgb(' + value + ', 76, 76)';
+                element.style["border-color"] = 'rgb(' + value + ', 0, 0, 0.90)';
+                element.style["border-width"] = 'thick';
+
             });
         }
     });
@@ -162,6 +153,10 @@ function handleEvent(type, selector, value) {
             selector: selector,
             value: value
         }
+    },
+    {},
+    response => {
+        applyClickProbabilityMask();
     });
     return true;
 }

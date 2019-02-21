@@ -52,17 +52,15 @@ function applyClickProbabilityMask() {
     chrome.runtime.sendMessage({
         kind: 'getProbabilities',
         events
-    }, 
-    {}, 
+    }, {},
     response => {
         if (response && response.probabilities) {
             response.probabilities.filter(element => element.probability > 0).forEach(probability_per_selector => {
-                console.log(probability_per_selector.probability)
+                console.log(probability_per_selector.probability);
                 const element = document.querySelector(probability_per_selector.selector);
-                const value = (probability_per_selector.probability / 20) * 255;
-                element.style["border-color"] = 'rgb(' + value + ', 0, 0, 0.90)';
-                element.style["border-width"] = 'thick';
-
+                console.log(probability_per_selector.probability);
+                const value = (probability_per_selector.probability) * 255;
+                element.style["outline"] = '5px solid rgb(' + value + ', ' + (255 - value) + ', 0, 0.90)';
             });
         }
     });
@@ -153,8 +151,7 @@ function handleEvent(type, selector, value) {
             selector: selector,
             value: value
         }
-    },
-    {},
+    }, {},
     response => {
         applyClickProbabilityMask();
     });

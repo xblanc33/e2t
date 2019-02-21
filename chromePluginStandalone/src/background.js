@@ -1,7 +1,7 @@
-let NaturalnessModel = require('./NaturalnessModel.js').NaturalnessModel;
-let Event = require('./Event.js').Event;
-let Sequence = require('./Sequence.js').Sequence;
-let Ngram = require('./Ngram.js').Ngram;
+let NaturalnessModel = require('../../staticAnalysis/NaturalnessModel.js').NaturalnessModel;
+let Event = require('../../staticAnalysis/Event.js').Event;
+let Sequence = require('../../staticAnalysis/Sequence.js').Sequence;
+let Ngram = require('../../staticAnalysis/Ngram').Ngram;
 let NavigationListener = require('./NavigationListener');
 
 const DEPTH = 2;
@@ -46,14 +46,16 @@ class Background {
                 return true;
 
             case 'addEventToExpedition':
-                //console.log('addEventToExpedition');
                 if (this.state.isRecording && this.state.expedition.events) {
+
                     this.state.expedition.events.push(msg.event); //DEPTH+1
                     let sequence = extractSequence(this.state.expedition);
+                    console.log(sequence);
+
                     this.state.naturalnessModel.learn(sequence);
                     //console.log(`learn:${JSON.stringify(sequence)}`);
 
-                    if (this.state.expedition.events.length == (DEPTH+1)) {    
+                    if (this.state.expedition.events.length == (DEPTH + 1)) {
                         //console.log('shift');
                         this.state.expedition.events.shift();
                     }
@@ -76,14 +78,12 @@ class Background {
                     let proba = 0;
                     if (successorModel != undefined) {
                         proba = successorModel.getProbability(new Event(event.type + event.selector + event.value));
-                        //console.log('successModel:'+proba);
                     }
                     return {
                         selector: event.selector,
                         probability: proba
                     };
                 });
-                //console.log(probabilities);
 
                 let knownProba = probabilities.filter(prob => prob.probability > 0);
                 console.log(knownProba);

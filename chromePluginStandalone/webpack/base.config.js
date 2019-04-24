@@ -4,9 +4,9 @@ const path = require('path');
 module.exports = {
     context: path.resolve(__dirname, '..'),
     entry: {
-        background: './src/background.js',
-        popup: './src/ui/Popup.jsx',
-        listener: './src/onPageListener.js'
+        background: './src/Background/background.js',
+        popup: './src/PluginUI/Popup.jsx',
+        listener: './src/BrowserPage/pageContent.js'
     },
     output: {
         filename: '[name].js',
@@ -27,7 +27,7 @@ module.exports = {
         new CopyPlugin([
             { from: './src/manifest.json', to: 'manifest.json' },
             { from: './src/images/plugin_icon.png', to: 'images/plugin_icon.png' },
-            { from: './src/popup.html', to: 'popup.html' },
+            { from: './src/PluginUI/popup.html', to: 'popup.html' },
             { from: './src/css/bootstrap.min.css', to: 'css/bootstrap.min.css' },
             { from: './src/css/bootstrap-theme.min.css', to: 'css/bootstrap-theme.min.css' },
             { from: './src/css/bootstrap2-toggle.css', to: 'css/bootstrap2-toggle.css' }

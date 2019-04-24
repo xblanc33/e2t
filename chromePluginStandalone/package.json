@@ -10,7 +10,9 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "react-bootstrap-buttons": "^0.3.0"
+  },
   "devDependencies": {
     "@medv/finder": "^1.1.1",
     "babel-core": "^6.26.3",

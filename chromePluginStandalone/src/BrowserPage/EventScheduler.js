@@ -26,8 +26,6 @@ export default class EventScheduler {
             } else {
                 this.eventRegister.registerNewEvent(event);
             }
-        } else {
-            console.log(event.DOMEvent.target, event.DOMEvent);
         }
     }
 

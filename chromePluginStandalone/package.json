@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "naturalness": "^1.0.0",
     "react-bootstrap-buttons": "^0.3.0"
   },
   "devDependencies": {

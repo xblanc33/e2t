@@ -12,9 +12,9 @@ class NavigationListener {
         //this.addBrowserListeners();
     }
 
-    startExpedition(state) {
+    startNavigation(windowId) {
         let promise = new Promise((res, rej) => {
-            chrome.windows.get(state.windowId, {
+            chrome.windows.get(windowId, {
                 populate: true
             }, window => {
                 if (window === null || window === undefined) rej();

@@ -4,12 +4,22 @@ const MODES = {
     STOP: 'stop'
 };
 
+const NEVER_THRESHOLD = 0;
+const SOMETIMES_THRESHOLD = 0.8;
+const OFTEN_THRESHOLD = 1;
+
 export default class MaskApplier {
 
+    constructor(naturalnessModel) {
+        this.naturalnessModel = naturalnessModel;
+    }
+
     apply(state, document) {
-        if (state.mode === MODES.INPUT) {
+        if (state.mode !== MODES.EXPLORE) {
             applyMaskInput(state, document);
-        }
+        } else {
+            applyMaskExplore(state, document);
+        } 
     }
 
 }
@@ -17,9 +27,23 @@ export default class MaskApplier {
 function applyMaskInput(state, document) {
     state.registeredEvents.forEach(event => {
         const element = document.querySelector(event.selector);
-        element.style["outline"] = `5px solid rgb(128, 0, 128)`;
+        if (element) {
+            element.classList.add('registered');
+        }
     });
-    
+}
+
+function applyMaskExplore(state, document) {
+    state.registeredEvents.forEach(event => {
+        const element = document.querySelector(event.selector);
+        if (element) {
+            const model = this.state.naturalnessModel;
+            this.state.registeredEvents.forEach(event => {
+                const proba = model.getPro;
+            });
+            element.classList.add('registered');
+        }
+    });
 }
 
 /*

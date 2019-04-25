@@ -12,6 +12,7 @@ export default class EventRegister {
         type : ${event.type} \n`;
 
         if (window.confirm(message)) {
+            event.DOMEvent.target.classList.add('registered');
             chrome.runtime.sendMessage({
                 kind: 'registerEvent',
                 event
@@ -26,12 +27,12 @@ export default class EventRegister {
         selector : ${event.selector} \n
         type : ${event.type} \n`;
 
-        if (window.confirm(message)) {
-            chrome.runtime.sendMessage({
-                kind: 'unregisterEvent',
-                event
-            }, {});
-        }
+        event.DOMEvent.target.classList.remove('registered');
+        chrome.runtime.sendMessage({
+            kind: 'unregisterEvent',
+            event
+        }, {});
+
     }
     
 }

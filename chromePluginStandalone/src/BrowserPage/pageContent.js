@@ -8,18 +8,21 @@ const HANDLED_EVENT_TYPES = ["change", "click"];
 class PageContent {
 
     constructor() {
+        this.handleMessages = this.handleMessages.bind(this);
+
+        this.init = true;
         this.handle_types = HANDLED_EVENT_TYPES;
         this.eventListener = new EventListener(document);
         this.eventRegister = new EventRegister();
-        this.maskApplier = new MaskApplier();
+
+        this.maskApplier = new MaskApplier(this.naturalnessModel);
 
         this.eventScheduler = new EventScheduler(this.eventRegister);
         this.eventListener.addObserver(this.eventScheduler);
 
 
         //Background update
-        this.onStateUpdate = this.onStateUpdate.bind(this);
-        chrome.runtime.onMessage.addListener(this.onStateUpdate);
+        chrome.runtime.onMessage.addListener(this.handleMessages);
 
         //Content Event
         HANDLED_EVENT_TYPES.forEach(type => {
@@ -27,6 +30,9 @@ class PageContent {
         });
 
         applyCSS();
+        setInterval(() => {
+            this.maskApplier.apply(this.state, document);
+        }, 1000);
 
 
         chrome.runtime.sendMessage({
@@ -35,57 +41,48 @@ class PageContent {
         state => {
             this.state = state;
             this.eventScheduler.state = state;
-            this.maskApplier.apply(state, document);
         });
     }
 
-    onStateUpdate(newState) {
-        this.state = newState;
-        this.eventScheduler.state = newState;
+    handleMessages(msg, sender, sendResponse) {
+        switch(msg.kind) {
 
-        this.maskApplier.apply(newState, document);
+            case 'isInit': 
+                sendResponse({init: this.init});
+                return true;
+
+            case 'setState': {
+                const newState = msg.newState;
+                this.state = newState;
+                this.eventScheduler.state = newState;
+                return true;
+            }
+        }
     }
 
 }
 
 const content = new PageContent();
 
-function attach() {
-    /*   const inputs = document.querySelectorAll('input, textarea');
-    inputs.forEach(
-        input => {
-            input.addEventListener('input', eventHandler.handleInput, true);
-        }
-    );
-
-   const observer = new MutationObserver(eventHandler.handleMutation);
-    const config = {
-        childList: true,
-        subtree: true
-    };
-
-    const all = document.querySelectorAll('*');
-    all.forEach(
-        element => {
-            observer.observe(element, config);
-        }
-    );
-
-    const selects = document.querySelectorAll('select');
-    selects.forEach(
-        select => {
-            select.addEventListener('change', eventHandler.handleChange, true);
-        }
-    );
-    
-*/
-    //applyClickProbabilityMask(cssSelectGenerator);
-}
-
 function applyCSS(){
     const css = `
         .registered {
             outline: 5px solid rgb(128, 0, 128);
+            outline-offset: '-4px';
+        }
+        .never {
+            outline: 4px solid #0000ff;
+            outline-offset: '-4px';
+        }
+        
+        .sometimes {
+          outline: 4px solid #008000;
+          outline-offset: '-4px';
+        }
+        
+        .often {
+          outline: 4px solid #ff0000;
+          outline-offset: '-4px';
         }`;
        
     var style = document.createElement("style");

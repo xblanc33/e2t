@@ -18,7 +18,6 @@ class Background {
 
         this.state = {
             windowId: undefined,
-
             expedition: {
                 events: []
             },
@@ -35,17 +34,16 @@ class Background {
 
     start() {
         chrome.runtime.onMessage.addListener(this.handleMessage);
+        this.updateContentState();
     }
 
     handleMessage(msg, sender, sendResponse) {
         switch (msg.kind) {
 
             case 'startExpedition':
-                this.state.windowId = msg.windowId;
                 this.state.mode = MODES.EXPLORE;
                 this.state.expedition.events = [];
                 this.state.naturalnessModel = new NaturalnessModel(DEPTH, PROBA_OF_UNKNOWN);
-                this.navigationListener.startExpedition(this.state);
                 this.updateContentState();
                 sendResponse(this.state);
                 return true;
@@ -67,9 +65,21 @@ class Background {
                 sendResponse(this.state);
                 return true;
 
+            case 'init':
+                chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        kind: 'isInit'
+                    }, response => {
+                        if (!response || !response.init) {
+                            this.navigationListener.startNavigation(msg.windowId);
+                        }
+                        sendResponse({init: true});
+                    });
+                });
+                return true;
+
             case 'registerEvent': {
                 const event = msg.event;
-
                 this.state.registeredEvents.push(event);
                 this.updateContentState();
                 return true;
@@ -126,8 +136,10 @@ class Background {
 
     updateContentState() {
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            console.log(this.state);
-            chrome.tabs.sendMessage(tabs[0].id, this.state);
+            chrome.tabs.sendMessage(tabs[0].id, {
+                kind: 'setState',
+                newState: this.state
+            });
         });
     }
 }

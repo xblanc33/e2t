@@ -22,9 +22,8 @@ class Background {
             mode: MODES.STOP,
             registeredEvents: [],
 
-            naturalnessModel: undefined,
+            naturalnessModel: new NaturalnessModel(DEPTH, PROBA_OF_UNKNOWN),
         };
-
 
         this.handleMessage = this.handleMessage.bind(this);
         this.navigationListener = new NavigationListener();
@@ -41,7 +40,6 @@ class Background {
             case 'startExpedition':
                 this.state.mode = MODES.EXPLORE;
                 this.state.expedition.events = [];
-                this.state.naturalnessModel = new NaturalnessModel(DEPTH, PROBA_OF_UNKNOWN);
                 this.updateContentState();
                 sendResponse(this.state);
                 return true;
@@ -99,9 +97,8 @@ class Background {
                 if (!this.state.registeredEvents.find((e) => e.id === event.id)) {
                     return;
                 }
-                this.state.expedition.events.push(new NaturalnessEvent(event.id));
+                this.state.expedition.events.push(new NaturalnessEvent(`${event.type},${event.selector}`));
                 let sequence = new Sequence(this.state.expedition.events);
-                console.log("learn", sequence);
 
                 this.state.naturalnessModel.learn(sequence);
             
@@ -118,7 +115,7 @@ class Background {
                 var probabilitiesPerEvent = msg.events.map(event => {
                     let probability = 0;
                     if (successorModel) {
-                        probability = successorModel.getProbability(new NaturalnessEvent(event.id));
+                        probability = successorModel.getProbability(new NaturalnessEvent(`${event.type},${event.selector}`));
                     }
                     return {
                         event,

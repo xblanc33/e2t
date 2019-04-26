@@ -28,11 +28,12 @@ export default class EventScheduler {
     }
 
     exploreEvent(event) {
-        event.DOMEvent.target.classList.remove('registered');
-        chrome.runtime.sendMessage({
-            kind: 'exploreEvent',
-            event
-        }, {});
+        if (this.state.registeredEvents.find((e) => event.id === e.id)) { 
+            chrome.runtime.sendMessage({
+                kind: 'exploreEvent',
+                event
+            }, {});
+        }
 
     }
 

@@ -56,7 +56,6 @@ function applyMaskInput(state, document) {
 
 
 function applyMaskExplore(state, document) {
-    clear(document);
 
     const availableElements = [];
     state.registeredEvents.forEach(event => {
@@ -69,6 +68,7 @@ function applyMaskExplore(state, document) {
         kind: 'getProbabilities',
         events: availableElements
     }, {}, probabilitiesPerEvent => {
+        clear(document);
         if (probabilitiesPerEvent) {
             probabilitiesPerEvent.forEach((probabilityForEvent) => {
                 const event = probabilityForEvent.event;

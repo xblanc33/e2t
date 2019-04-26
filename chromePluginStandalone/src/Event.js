@@ -6,6 +6,10 @@ export default class Event {
         this.DOMEvent = DOMEvent;
         this.id = hashCode(JSON.stringify(this));
     }
+
+    toString() {
+        return `${this.type},${this.selector}`;
+    }
 }
 
 

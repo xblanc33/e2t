@@ -30,8 +30,9 @@ class BrowserPage {
 
         setInterval(() => {
             this.maskApplier.apply(this.state, document);
-        }, 1000);
+        }, 300);
 
+        
 
         chrome.runtime.sendMessage({
             kind: 'getState'

@@ -1,3 +1,5 @@
+import CSS from "./mask_css";
+
 const MODES = {
     INPUT: 'input',
     EXPLORE: 'explore',
@@ -6,7 +8,6 @@ const MODES = {
 
 const NEVER_THRESHOLD = 0;
 const SOMETIMES_THRESHOLD = 0.8;
-const OFTEN_THRESHOLD = 1;
 
 export default class MaskApplier {
 
@@ -22,54 +23,67 @@ export default class MaskApplier {
         } 
     }
 
+    initCSS(document) {
+        const css = CSS;
+        var style = document.createElement("style");
+        style.setAttribute("type", "text/css");
+        style.appendChild(document.createTextNode(css));
+        document.getElementsByTagName("head")[0].appendChild(style);
+    }
+
+}
+
+function clear(document) {
+    const cssClasses = ["registered", "never", "sometimes", "often"];
+    cssClasses.forEach(cssClass => {
+        const elements = document.querySelectorAll(`.${cssClass}`);
+        elements.forEach((element) => {
+            if (element) {
+                element.classList.remove(cssClass);
+            }
+        });
+    }); 
 }
 
 function applyMaskInput(state, document) {
+    clear(document);
+
     state.registeredEvents.forEach(event => {
-        const element = document.querySelector(event.selector);
-        if (element) {
-            element.classList.add('registered');
-        }
+        const elements = document.querySelectorAll(event.selector);
+        elements.forEach((element) => element.classList.add('registered'));
     });
 }
+
 
 function applyMaskExplore(state, document) {
+    clear(document);
+
+    const availableElements = [];
     state.registeredEvents.forEach(event => {
-        const element = document.querySelector(event.selector);
-        if (element) {
-            const model = this.state.naturalnessModel;
-            this.state.registeredEvents.forEach(event => {
-                const proba = model.getPro;
+        if (document.querySelector(event.selector)) {
+            availableElements.push(event);
+        }
+    });
+
+    chrome.runtime.sendMessage({
+        kind: 'getProbabilities',
+        events: availableElements
+    }, {}, probabilitiesPerEvent => {
+        if (probabilitiesPerEvent) {
+            probabilitiesPerEvent.forEach((probabilityForEvent) => {
+                const event = probabilityForEvent.event;
+                const probability = probabilityForEvent.probability;
+                let classToApply;
+                if (probability <= NEVER_THRESHOLD) {
+                    classToApply = "never";
+                } else if (probability <= SOMETIMES_THRESHOLD) {
+                    classToApply = "sometimes";
+                } else {
+                    classToApply = "often";
+                }
+                const elements = document.querySelectorAll(event.selector);
+                elements.forEach((element) => element.classList.add(classToApply));
             });
-            element.classList.add('registered');
         }
     });
 }
-
-/*
-applyMask(document, chrome) {
-        const elements = document.querySelectorAll('*');
-
-        const events = [];
-        elements.forEach(element => events.push({
-            type: 'click',
-            selector: this.cssSelectGenerator.generate(element),
-            value: 'click'
-        }));
-    
-        chrome.runtime.sendMessage({
-            kind: 'getProbabilities',
-            events
-        }, {},
-        response => {
-            if (response && response.probabilities) {
-                response.probabilities
-                    //.filter(element => element.probability > 0)
-                    .forEach(probability_per_selector => {
-                        const element = document.querySelector(probability_per_selector.selector);
-                        const value = (probability_per_selector.probability) * 255;
-                        element.style["outline"] = '5px solid rgb(' + value + ', ' + (255 - value) + ', 0, 0.90)';
-                    });
-            }
-        });
-    }*/

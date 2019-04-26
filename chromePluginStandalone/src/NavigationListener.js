@@ -1,4 +1,4 @@
-class NavigationListener {
+export default class NavigationListener {
 
     constructor() {
         this.window = null;
@@ -54,5 +54,3 @@ class NavigationListener {
         }
     }
 }
-
-module.exports = NavigationListener;

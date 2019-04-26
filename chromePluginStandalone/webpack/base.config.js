@@ -6,7 +6,7 @@ module.exports = {
     entry: {
         background: './src/Background/background.js',
         popup: './src/PluginUI/Popup.jsx',
-        listener: './src/BrowserPage/pageContent.js'
+        listener: './src/BrowserPage/BrowserPage.js'
     },
     output: {
         filename: '[name].js',

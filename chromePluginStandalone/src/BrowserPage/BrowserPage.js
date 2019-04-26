@@ -1,11 +1,10 @@
 import EventListener from "./EventListener/EventListener";
-import EventRegister from "./EventRegister/EventRegister";
 import EventScheduler from "./EventScheduler";
 import MaskApplier from "./MaskApplier/MaskApplier";
 
 const HANDLED_EVENT_TYPES = ["change", "click"];
 
-class PageContent {
+class BrowserPage {
 
     constructor() {
         this.handleMessages = this.handleMessages.bind(this);
@@ -13,11 +12,11 @@ class PageContent {
         this.init = true;
         this.handle_types = HANDLED_EVENT_TYPES;
         this.eventListener = new EventListener(document);
-        this.eventRegister = new EventRegister();
 
         this.maskApplier = new MaskApplier(this.naturalnessModel);
+        this.maskApplier.initCSS(document);
 
-        this.eventScheduler = new EventScheduler(this.eventRegister);
+        this.eventScheduler = new EventScheduler();
         this.eventListener.addObserver(this.eventScheduler);
 
 
@@ -29,7 +28,6 @@ class PageContent {
             document.body.addEventListener(type, this.eventListener.receiveEvent, true);
         });
 
-        applyCSS();
         setInterval(() => {
             this.maskApplier.apply(this.state, document);
         }, 1000);
@@ -62,31 +60,5 @@ class PageContent {
 
 }
 
-const content = new PageContent();
+const content = new BrowserPage();
 
-function applyCSS(){
-    const css = `
-        .registered {
-            outline: 5px solid rgb(128, 0, 128);
-            outline-offset: '-4px';
-        }
-        .never {
-            outline: 4px solid #0000ff;
-            outline-offset: '-4px';
-        }
-        
-        .sometimes {
-          outline: 4px solid #008000;
-          outline-offset: '-4px';
-        }
-        
-        .often {
-          outline: 4px solid #ff0000;
-          outline-offset: '-4px';
-        }`;
-       
-    var style = document.createElement("style");
-    style.setAttribute("type", "text/css");
-    style.appendChild(document.createTextNode(css));
-    document.getElementsByTagName("head")[0].appendChild(style);
-}

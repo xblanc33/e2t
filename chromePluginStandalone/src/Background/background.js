@@ -1,8 +1,6 @@
-let NaturalnessModel = require('../../../staticAnalysis/NaturalnessModel.js').NaturalnessModel;
-let Event = require('../../../staticAnalysis/Event.js').Event;
-let Sequence = require('../../../staticAnalysis/Sequence.js').Sequence;
-let Ngram = require('../../../staticAnalysis/Ngram').Ngram;
-let NavigationListener = require('../NavigationListener');
+import {Sequence, Ngram, NaturalnessModel}  from "naturalness";
+import {Event as NaturalnessEvent}  from "naturalness";
+import NavigationListener from "../NavigationListener";
 
 const DEPTH = 2;
 const PROBA_OF_UNKNOWN = 0.000001;
@@ -70,8 +68,11 @@ class Background {
                     chrome.tabs.sendMessage(tabs[0].id, {
                         kind: 'isInit'
                     }, response => {
-                        if (!response || !response.init) {
-                            this.navigationListener.startNavigation(msg.windowId);
+                        if (chrome.runtime.lastError) {
+                            var errorMsg = chrome.runtime.lastError.message;
+                            if (errorMsg == "Could not establish connection. Receiving end does not exist.") {
+                                this.navigationListener.startNavigation(msg.windowId);
+                            }
                         }
                         sendResponse({init: true});
                     });
@@ -95,12 +96,13 @@ class Background {
 
             case 'exploreEvent': {
                 const event = msg.event;
-                if (!this.state.registeredEvents.has(event)) {
+                if (!this.state.registeredEvents.find((e) => e.id === event.id)) {
                     return;
                 }
-                this.state.expedition.events.push(event);
-                let sequence = extractSequence(this.state.expedition);
-            
+                this.state.expedition.events.push(new NaturalnessEvent(event.id));
+                let sequence = new Sequence(this.state.expedition.events);
+                console.log("learn", sequence);
+
                 this.state.naturalnessModel.learn(sequence);
             
                 if (this.state.expedition.events.length == (DEPTH + 1)) {
@@ -111,25 +113,22 @@ class Background {
             }
 
             case 'getProbabilities': {
-                let eventList = this.state.expedition.events.map(event => {
-                    let eventValue = event.type + event.selector + event.value;
-                    return new Event(eventValue);
-                });
-                let ngram = new Ngram(eventList);
+                let ngram = new Ngram(this.state.expedition.events);
                 let successorModel = this.state.naturalnessModel.getNgramSuccessorModel(ngram);
-                var probabilities = msg.events.map(event => {
-                    let proba = 0;
-                    if (successorModel != undefined) {
-                        proba = successorModel.getProbability(new Event(event.type + event.selector + event.value));
+                var probabilitiesPerEvent = msg.events.map(event => {
+                    let probability = 0;
+                    if (successorModel) {
+                        probability = successorModel.getProbability(new NaturalnessEvent(event.id));
                     }
                     return {
-                        selector: event.selector,
-                        probability: proba
+                        event,
+                        probability
                     };
                 });
-                return sendResponse({
-                    probabilities
-                });
+                
+                return sendResponse(
+                    probabilitiesPerEvent
+                );
             }
         }
     }
@@ -144,13 +143,6 @@ class Background {
     }
 }
 
-function extractSequence(expedition) {
-    let eventList = expedition.events.map(event => {
-        let eventValue = event.type + event.selector + event.value;
-        return new Event(eventValue);
-    });
-    return new Sequence(eventList);
-}
 
 var background = new Background();
 background.start();
